@@ -1,0 +1,70 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║           🚀 SAI DO VERMELHO - COMEÇO RÁPIDO 🚀               ║
+║                                                                ║
+║              Sua jornada para R$ 1 MILHÃO começa AGORA         ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+📋 PASSO A PASSO (FAZENDO AGORA):
+
+1️⃣  ABRA ESSAS CONTAS (se não tiver):
+   ✅ GitHub.com (criar repositório)
+   ✅ Supabase.com (banco de dados)
+   ✅ Stripe.com (pagamentos)
+   ✅ Vercel.com (deploy)
+   ✅ Console.anthropic.com (IA)
+
+2️⃣  COPIE AS CHAVES:
+   ✅ NEXT_PUBLIC_SUPABASE_URL
+   ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY
+   ✅ SUPABASE_SERVICE_KEY
+   ✅ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+   ✅ STRIPE_SECRET_KEY
+   ✅ ANTHROPIC_API_KEY
+
+3️⃣  CRIE ARQUIVO .env.local NA RAIZ DO PROJETO:
+
+   NEXT_PUBLIC_SUPABASE_URL=https://[seu-id].supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51...
+   STRIPE_SECRET_KEY=sk_test_51...
+
+   ANTHROPIC_API_KEY=sk-ant-v0-...
+
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+4️⃣  NO SEU TERMINAL:
+
+   npm install
+   npm run dev
+
+5️⃣  ABRA NO NAVEGADOR:
+
+   http://localhost:3000
+
+6️⃣  VER FUNCIONANDO:
+
+   Você já tem o app rodando! 🎉
+
+   Agora só testar e depois fazer deploy.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💬 QUALQUER DÚVIDA, MANDA MENSAGEM PRO CLAUDE
+
+Eu estou aqui 24/7 pra:
+✅ Debugar bugs
+✅ Adicionar features
+✅ Otimizar performance
+✅ Fazer deploy
+✅ Lançar campanhas
+✅ Virar você milionário 💰
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+LÊ O ARQUIVO: SETUP.md (tem mais detalhes)
+
+VEM! Vamos fazer isso! 🚀🔥
