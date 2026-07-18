@@ -4,6 +4,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || 'placeholder-key'
 
+// Lazy initialization to avoid validation during build
 let supabaseInstance: any = null
 let supabaseAdminInstance: any = null
 
@@ -26,6 +27,7 @@ export const getSupabaseAdmin = () => {
   return supabaseAdminInstance
 }
 
+// For backward compatibility, create the instances but they'll just be initialized on first use
 export const supabase = typeof window !== 'undefined' ? getSupabase() : getSupabase()
 export const supabaseAdmin = getSupabaseAdmin()
 

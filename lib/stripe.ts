@@ -14,12 +14,12 @@ export const PRICE_IDS = {
 export const PRICING = {
   premium: {
     name: 'Premium',
-    price: 1900,
-    description: 'Acesso completo à IA e acompanhamento',
+    price: 1900, // R$ 19.00 in cents
+    description: 'Accesso completo à IA e acompanhamento',
   },
   pro: {
     name: 'Pro',
-    price: 4900,
+    price: 4900, // R$ 49.00 in cents
     description: 'Comunidade + análise avançada',
   },
 }

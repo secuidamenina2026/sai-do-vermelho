@@ -1,24 +1,28 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+const apiKey = process.env.ANTHROPIC_API_KEY || ''
+
+export const anthropic = new Anthropic({ apiKey })
 
 export async function generateFinancialAdvice(
   category: string,
-  question: string,
-  monthlyIncome: number,
-  monthlySpending: number
-) {
-  const prompt = `Você é um consultor financeiro especializado. O usuário ganha R$ ${monthlyIncome}/mês e gasta R$ ${monthlySpending}/mês.
+  income: number,
+  currentSpending: number,
+  question: string
+): Promise<string> {
+  const prompt = `Você é um consultor financeiro experiente que ajuda brasileiros a organizar suas finanças.
 
-Pergunta sobre ${category}: ${question}
+Informações do cliente:
+- Renda mensal: R$ ${income.toFixed(2)}
+- Categoria: ${category}
+- Gasto atual nesta categoria: R$ ${currentSpending.toFixed(2)}
+- Pergunta: ${question}
 
-Responda em português, de forma prática e acionável. Máximo 3 parágrafos.`
+Fornece um conselho prático, breve (máximo 3 parágrafos) e acionável para melhorar a situação financeira desta pessoa nesta categoria. Use a metodologia 50-30-20 (50% essenciais, 30% desejos, 20% poupança) como referência.`
 
-  const message = await client.messages.create({
+  const message = await anthropic.messages.create({
     model: 'claude-3-5-sonnet-20241022',
-    max_tokens: 1024,
+    max_tokens: 500,
     messages: [
       {
         role: 'user',
@@ -27,23 +31,31 @@ Responda em português, de forma prática e acionável. Máximo 3 parágrafos.`
     ],
   })
 
-  return message.content[0].type === 'text' ? message.content[0].text : ''
+  const textContent = message.content.find((block) => block.type === 'text')
+  return textContent && textContent.type === 'text' ? textContent.text : ''
 }
 
-export async function optimizeBudget(income: number, expenses: Record<string, number>) {
-  const prompt = `Você é um especialista em finanças pessoais. Analize este orçamento:
+export async function optimizeBudget(
+  income: number,
+  expenses: Record<string, number>
+): Promise<string> {
+  const expensesList = Object.entries(expenses)
+    .map(([cat, amount]) => `${cat}: R$ ${amount.toFixed(2)}`)
+    .join('\n')
 
-Renda: R$ ${income}
-Despesas atuais: ${Object.entries(expenses)
-    .map(([cat, val]) => `${cat}: R$ ${val}`)
-    .join(', ')}
+  const prompt = `Você é um especialista em finanças pessoais. Analise este orçamento e recomende otimizações:
 
-Use o método 50-30-20 (50% essenciais, 30% desejos, 20% poupança) e sugira otimizações.
-Responda em português, máximo 4 parágrafos.`
+Renda: R$ ${income.toFixed(2)}
+Despesas:
+${expensesList}
 
-  const message = await client.messages.create({
+Metodologia: 50% essenciais, 30% desejos, 20% poupança
+
+Forneça 3-4 recomendações práticas (máximo 150 palavras) para melhorar o orçamento.`
+
+  const message = await anthropic.messages.create({
     model: 'claude-3-5-sonnet-20241022',
-    max_tokens: 1024,
+    max_tokens: 400,
     messages: [
       {
         role: 'user',
@@ -52,5 +64,6 @@ Responda em português, máximo 4 parágrafos.`
     ],
   })
 
-  return message.content[0].type === 'text' ? message.content[0].text : ''
+  const textContent = message.content.find((block) => block.type === 'text')
+  return textContent && textContent.type === 'text' ? textContent.text : ''
 }

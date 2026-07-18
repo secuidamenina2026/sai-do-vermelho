@@ -1,50 +1,48 @@
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabase, getSupabaseAdmin } from '@/lib/supabase'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
     const { action, email, password, fullName } = await request.json()
-    const supabase = getSupabase()
-    const supabaseAdmin = getSupabaseAdmin()
+    const supabase = createRouteHandlerClient({ cookies })
 
     if (action === 'signup') {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+        },
       })
 
-      if (authError) throw authError
-
-      if (authData.user) {
-        const { error: userError } = await supabaseAdmin
-          .from('users')
-          .insert({
-            id: authData.user.id,
-            email,
-            full_name: fullName,
-            plan: 'free',
-          })
-
-        if (userError) throw userError
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 })
       }
 
-      return NextResponse.json({ success: true })
-    }
-
-    if (action === 'signin') {
+      return NextResponse.json(data)
+    } else if (action === 'signin') {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 })
+      }
 
-      return NextResponse.json({ success: true, user: data.user })
+      return NextResponse.json(data)
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
   } catch (error) {
-    console.error('Auth error:', error)
-    return NextResponse.json({ error: 'Auth failed' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }

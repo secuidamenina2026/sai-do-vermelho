@@ -1,55 +1,59 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
-export default function LoginPage() {
+export default function Login() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  const [error, setError] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setError('')
+    setLoading(true)
 
     try {
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'signin', email, password }),
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      if (res.ok) {
-        router.push('/dashboard')
-      } else {
-        setError('Email ou senha incorretos')
-      }
-    } catch (err) {
-      setError('Erro ao fazer login')
+      if (error) throw error
+
+      router.push('/dashboard')
+    } catch (err: any) {
+      setError(err.message || 'Erro ao fazer login')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center py-12 px-4">
       <div className="card max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
-        
-        {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
+        <h1 className="text-3xl font-bold text-center mb-2">Bem-vindo de Volta</h1>
+        <p className="text-center text-gray-600 mb-6">Faça login na sua conta</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSignIn} className="space-y-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
+
           <div>
             <label className="label">Email</label>
             <input
               type="email"
-              className="input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="input"
+              placeholder="seu@email.com"
               required
             />
           </div>
@@ -58,9 +62,10 @@ export default function LoginPage() {
             <label className="label">Senha</label>
             <input
               type="password"
-              className="input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="input"
+              placeholder="••••••••"
               required
             />
           </div>
@@ -70,12 +75,15 @@ export default function LoginPage() {
             disabled={loading}
             className="btn btn-primary w-full"
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? 'Entrando...' : 'Fazer Login'}
           </button>
         </form>
 
-        <p className="text-center mt-4">
-          Não tem conta? <Link href="/auth/register" className="text-blue-600 hover:underline">Registre-se</Link>
+        <p className="text-center text-gray-600 mt-6">
+          Não tem conta?{' '}
+          <Link href="/auth/register" className="text-blue-600 hover:underline font-medium">
+            Criar conta grátis
+          </Link>
         </p>
       </div>
     </div>
