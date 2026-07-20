@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
@@ -10,7 +11,12 @@ let supabaseAdminInstance: any = null
 
 export const getSupabase = () => {
   if (!supabaseInstance) {
-    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey)
+    // No navegador usa o client de cookies (auth-helpers) para que as rotas
+    // do servidor consigam ler a sessão; no build/server usa o client padrão.
+    supabaseInstance =
+      typeof window !== 'undefined'
+        ? createClientComponentClient()
+        : createClient(supabaseUrl, supabaseAnonKey)
   }
   return supabaseInstance
 }
