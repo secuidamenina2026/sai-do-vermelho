@@ -13,6 +13,7 @@ export function Sidebar() {
     { href: '/dashboard/gastos', label: '💳 Gastos', icon: '💳' },
     { href: '/dashboard/dividas', label: '📉 Dívidas', icon: '📉' },
     { href: '/dashboard/metas', label: '🎯 Metas', icon: '🎯' },
+    { href: '/dashboard/ia', label: '🤖 Consultoria IA', icon: '🤖' },
     { href: '/dashboard/resumo', label: '📈 Resumo', icon: '📈' },
   ]
 

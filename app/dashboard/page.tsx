@@ -200,11 +200,14 @@ export default function Dashboard() {
           <p className="text-sm text-gray-600">Defina e acompanhe suas metas de poupança</p>
         </Link>
 
-        <div className="card hover:shadow-md transition-shadow cursor-pointer">
+        <Link
+          href="/dashboard/ia"
+          className="card hover:shadow-md transition-shadow cursor-pointer"
+        >
           <div className="text-3xl mb-2">🤖</div>
           <h3 className="font-bold mb-1">Consultoria IA</h3>
           <p className="text-sm text-gray-600">Receba recomendações personalizadas</p>
-        </div>
+        </Link>
       </div>
     </div>
   )
