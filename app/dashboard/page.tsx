@@ -85,6 +85,23 @@ export default function Dashboard() {
         <p className="text-gray-600">Aqui está sua visão geral financeira</p>
       </div>
 
+      {/* Diagnóstico CTA — destaque principal */}
+      <Link
+        href="/dashboard/diagnostico"
+        className="block bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow"
+      >
+        <div className="flex items-center gap-4">
+          <div className="text-5xl">🩺</div>
+          <div className="flex-1">
+            <h2 className="text-xl md:text-2xl font-bold mb-1">Faça seu Diagnóstico Financeiro GRÁTIS</h2>
+            <p className="text-white/90 text-sm md:text-base">
+              Em 2 minutos você descobre o tamanho real das suas dívidas e recebe um plano de ataque. Comece por aqui! 👇
+            </p>
+          </div>
+          <div className="hidden md:block text-3xl">→</div>
+        </div>
+      </Link>
+
       {/* Quick Stats */}
       <div className="grid md:grid-cols-4 gap-4">
         <div className="card">

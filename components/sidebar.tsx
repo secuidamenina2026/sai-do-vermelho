@@ -9,6 +9,7 @@ export function Sidebar() {
 
   const items = [
     { href: '/dashboard', label: '📊 Dashboard', icon: '📊' },
+    { href: '/dashboard/diagnostico', label: '🩺 Diagnóstico Grátis', icon: '🩺' },
     { href: '/dashboard/orcamento', label: '💰 Orçamento', icon: '💰' },
     { href: '/dashboard/gastos', label: '💳 Gastos', icon: '💳' },
     { href: '/dashboard/dividas', label: '📉 Dívidas', icon: '📉' },
