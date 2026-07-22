@@ -83,3 +83,20 @@ hint: 'git pull' before pushing again.
 hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 ==== FIM SYNC ==== 
 ==== SYNC2 22/07/2026 19:21:49,61 ==== 
+[master 0674028] Sync antes do rebase
+ 2 files changed, 93 insertions(+)
+ create mode 100644 SYNC.bat
+From https://github.com/secuidamenina2026/sai-do-vermelho
+ * branch            master     -> FETCH_HEAD
+   bd0d3a3..409d3fb  master     -> origin/master
+error: unable to unlink old 'deploy_log.txt': Invalid argument
+fatal: could not reset --hard
+Created autostash: 74f5df8
+To https://github.com/secuidamenina2026/sai-do-vermelho.git
+ ! [rejected]        master -> master (non-fast-forward)
+error: failed to push some refs to 'https://github.com/secuidamenina2026/sai-do-vermelho.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+==== FIM SYNC2 ==== 

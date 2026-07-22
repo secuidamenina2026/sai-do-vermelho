@@ -34,3 +34,6 @@ Thumbs.db
 codigo-corrigido.tar.gz
 update-ia-kiwify.tar.gz
 fix-auth-cookies.tar.gz
+sync_log.txt
+SYNC.bat
+*.tar.gz
