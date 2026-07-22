@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-const KIWIFY_PRO = 'https://pay.kiwify.com.br/Prgqhsb'
+const KIWIFY_PRO = 'https://pay.kiwify.com.br/1XzR7vC'
 
 const CATEGORIAS = [
   { value: 'geral', label: '💬 Pergunta geral' },

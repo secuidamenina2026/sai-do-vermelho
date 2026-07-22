@@ -48,7 +48,7 @@ export function Pricing() {
         'Relatórios completos',
       ],
       cta: 'Assinar o Plano Completo',
-      ctaHref: 'https://pay.kiwify.com.br/Prgqhsb',
+      ctaHref: 'https://pay.kiwify.com.br/1XzR7vC',
       highlighted: true,
     },
   ]

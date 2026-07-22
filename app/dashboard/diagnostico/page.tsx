@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
-const KIWIFY_PRO = 'https://pay.kiwify.com.br/Prgqhsb'
+const KIWIFY_PRO = 'https://pay.kiwify.com.br/1XzR7vC'
 
 const TIPOS_DIVIDA = [
   '💳 Cartão de crédito',
