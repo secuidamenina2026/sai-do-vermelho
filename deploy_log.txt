@@ -1,1 +1,85 @@
 ==== DEPLOY SAI DO VERMELHO v2 ==== 
+warning: in the working copy of '.env.example', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.force-rebuild', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ARQUITETURA.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'CONCLUSAO_TECNICA.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'DEPLOYMENT_READY.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'DEPLOY_AGORA.sh', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'DEPLOY_CHECKLIST.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'DEPLOY_RAPIDO.sh', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ENTREGA.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'EXECUTIVO.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'INICIO_AQUI.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'PLANO_EXECUCAO.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'PRONTO_PARA_RODAR.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'PUSH_COMMAND.sh', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'SETUP.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'STATUS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'SUPABASE_SETUP.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/api/ai/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/api/auth/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/api/checkout/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/api/user/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/api/webhooks/kiwify/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/api/webhooks/stripe/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/auth/login/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/auth/register/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/dashboard/diagnostico/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/dashboard/dividas/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/dashboard/gastos/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/dashboard/ia/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/dashboard/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/dashboard/metas/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/dashboard/orcamento/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/dashboard/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/dashboard/resumo/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/navbar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/pricing.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/sidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'database.sql', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/anthropic.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/stripe.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'lib/supabase.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'middleware.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'next-env.d.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'next.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package-lock.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'postcss.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'styles/globals.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tailwind.config.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tsconfig.json', LF will be replaced by CRLF the next time Git touches it
+[master adbd0bb] Producao: correcoes completas
+ 9 files changed, 320 insertions(+), 1 deletion(-)
+ create mode 100644 Videos/WhatsApp Video 2026-07-18 at 10.33.29.mp4
+ create mode 100644 Videos/WhatsApp Video 2026-07-18 at 10.34.34 (1).mp4
+ create mode 100644 Videos/WhatsApp Video 2026-07-18 at 10.34.34.mp4
+ create mode 100644 Videos/Woman_using_financial_app_202607172233.mp4
+ create mode 100644 app/dashboard/diagnostico/page.tsx
+ create mode 100644 update-diagnostico.tar.gz
+To https://github.com/secuidamenina2026/sai-do-vermelho.git
+ ! [rejected]        master -> master (fetch first)
+error: failed to push some refs to 'https://github.com/secuidamenina2026/sai-do-vermelho.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+==== FIM ==== 
+==== SYNC 22/07/2026 19:20:30,29 ==== 
+error: cannot pull with rebase: You have unstaged changes.
+error: Please commit or stash them.
+To https://github.com/secuidamenina2026/sai-do-vermelho.git
+ ! [rejected]        master -> master (fetch first)
+error: failed to push some refs to 'https://github.com/secuidamenina2026/sai-do-vermelho.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+==== FIM SYNC ==== 
+==== SYNC2 22/07/2026 19:21:49,61 ==== 
