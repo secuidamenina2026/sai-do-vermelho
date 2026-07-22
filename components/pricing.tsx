@@ -32,40 +32,24 @@ export function Pricing() {
       highlighted: false,
     },
     {
-      name: 'Basic',
-      price: 'R$ 29',
+      name: 'Plano Completo',
+      price: 'R$ 47',
       period: '/mês',
-      description: 'Para quem quer mais controle',
+      description: 'Tudo destravado — menos de R$1,60 por dia',
       features: [
         'Tudo do Free +',
-        'Orçamento completo',
+        'Consultoria IA ilimitada 24/7 por chat',
+        'Orçamento completo 50-30-20 automático',
         'Rastreio de gastos por categoria',
-        'IA consultoria 24/7 por chat',
-        'Exportar relatório completo',
-        'Histórico de 12 meses',
-        'Alertas automáticos',
         'Calculadora de dívidas (bola de neve)',
-      ],
-      cta: 'Assinar o Basic',
-      ctaHref: 'https://pay.kiwify.com.br/VstQarh',
-      highlighted: true,
-    },
-    {
-      name: 'Pro',
-      price: 'R$ 69',
-      period: '/mês',
-      description: 'Acesso completo + prioridade',
-      features: [
-        'Tudo do Basic +',
-        'Acesso à comunidade SAI DO VERMELHO',
-        'Análise avançada (gráficos, trends)',
-        'Consultoria IA priorizada (< 5 min)',
         'Metas inteligentes (IA sugere)',
-        'Relatórios mensais personalizados',
+        'Alertas automáticos',
+        'Histórico de 12 meses',
+        'Relatórios completos',
       ],
-      cta: 'Assinar o Pro',
+      cta: 'Assinar o Plano Completo',
       ctaHref: 'https://pay.kiwify.com.br/Prgqhsb',
-      highlighted: false,
+      highlighted: true,
     },
   ]
 
@@ -76,7 +60,7 @@ export function Pricing() {
         Sem taxas ocultas. Cancele quando quiser. Garantia 30 dias.
       </p>
 
-      <div className="grid md:grid-cols-3 gap-8">
+      <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
         {plans.map((plan) => (
           <div
             key={plan.name}

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-const KIWIFY_BASIC = 'https://pay.kiwify.com.br/VstQarh'
 const KIWIFY_PRO = 'https://pay.kiwify.com.br/Prgqhsb'
 
 const CATEGORIAS = [
@@ -93,16 +92,11 @@ export default function ConsultoriaIA() {
           <h3 className="text-xl font-bold mb-2">🔒 A Consultoria IA é exclusiva dos planos pagos</h3>
           <p className="text-gray-700 mb-4">
             Desbloqueie um consultor financeiro pessoal 24h por dia, que conhece seus números
-            e te diz exatamente o que fazer — por menos de R$1 por dia.
+            e te diz exatamente o que fazer — por menos de R$1,60 por dia.
           </p>
-          <div className="grid md:grid-cols-2 gap-4">
-            <a href={KIWIFY_BASIC} className="btn btn-primary text-center">
-              Plano Basic — R$29/mês
-            </a>
-            <a href={KIWIFY_PRO} className="btn btn-secondary text-center">
-              Plano Pro — R$69/mês
-            </a>
-          </div>
+          <a href={KIWIFY_PRO} className="btn btn-primary text-center block w-full text-lg py-4">
+            ⭐ Assinar o Plano Completo — R$47/mês
+          </a>
           <p className="text-sm text-gray-500 mt-3 text-center">
             Garantia de 7 dias. Cancele quando quiser.
           </p>

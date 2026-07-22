@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 const KIWIFY_PRO = 'https://pay.kiwify.com.br/Prgqhsb'
-const KIWIFY_BASIC = 'https://pay.kiwify.com.br/VstQarh'
 
 const TIPOS_DIVIDA = [
   '💳 Cartão de crédito',
@@ -261,7 +260,7 @@ export default function Diagnostico() {
               Esse diagnóstico é só o começo. No plano completo, você destrava:
             </p>
             <ul className="space-y-2 text-sm mb-4">
-              <li className="flex gap-2"><span>🤖</span><span><b>Consultoria de IA ilimitada:</b> pergunte "como quito o cartão em 4 meses?" e receba um plano feito para os SEUS números — como um consultor de R$300/hora, por menos de R$1 por dia</span></li>
+              <li className="flex gap-2"><span>🤖</span><span><b>Consultoria de IA ilimitada:</b> pergunte "como quito o cartão em 4 meses?" e receba um plano feito para os SEUS números — como um consultor de R$300/hora, por menos de R$1,60 por dia</span></li>
               <li className="flex gap-2"><span>📉</span><span><b>Plano de quitação acompanhado mês a mês</b> — o app recalcula sua bola de neve a cada pagamento</span></li>
               <li className="flex gap-2"><span>📊</span><span><b>Orçamento 50-30-20 automático</b> com alertas quando algo sai do trilho</span></li>
               <li className="flex gap-2"><span>🎯</span><span><b>Metas inteligentes</b> — a IA sugere quanto guardar e onde cortar</span></li>
@@ -274,13 +273,7 @@ export default function Diagnostico() {
               href={KIWIFY_PRO}
               className="btn btn-primary w-full text-center text-lg py-4 mb-2 block"
             >
-              ⭐ ASSINAR O PLANO PRO AGORA — R$69/mês
-            </a>
-            <a
-              href={KIWIFY_BASIC}
-              className="block w-full text-center text-sm text-blue-700 underline py-2"
-            >
-              ou comece com o Basic por R$29/mês
+              ⭐ ASSINAR O PLANO COMPLETO — R$47/mês
             </a>
             <p className="text-xs text-gray-500 text-center mt-2">
               Garantia de 7 dias · Cancele quando quiser · Pagamento seguro
