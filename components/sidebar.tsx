@@ -13,26 +13,27 @@ export function Sidebar() {
     { href: '/dashboard/orcamento', label: '💰 Orçamento', icon: '💰' },
     { href: '/dashboard/gastos', label: '💳 Gastos', icon: '💳' },
     { href: '/dashboard/dividas', label: '📉 Dívidas', icon: '📉' },
+    { href: '/dashboard/plano', label: '🚀 Meu Plano', icon: '🚀' },
     { href: '/dashboard/metas', label: '🎯 Metas', icon: '🎯' },
     { href: '/dashboard/ia', label: '🤖 Consultoria IA', icon: '🤖' },
     { href: '/dashboard/resumo', label: '📈 Resumo', icon: '📈' },
   ]
 
   return (
-    <aside className="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+    <aside className="w-full md:w-64 bg-white shadow-sm border-r border-gray-200 md:min-h-screen">
       <div className="p-6">
         <h2 className="text-lg font-bold flex items-center gap-2">
           💰 Sai do Vermelho
         </h2>
       </div>
 
-      <nav className="space-y-1 px-3">
+      <nav className="flex md:block gap-1 overflow-x-auto px-3 pb-3 md:space-y-1 md:pb-0">
         {items.map((item) => (
           <Link
             key={item.href}
             href={item.href}
             className={clsx(
-              'block px-4 py-3 rounded-lg transition-colors',
+              'block whitespace-nowrap px-4 py-3 rounded-lg transition-colors',
               pathname === item.href
                 ? 'bg-blue-100 text-blue-900 font-medium'
                 : 'text-gray-700 hover:bg-gray-100'

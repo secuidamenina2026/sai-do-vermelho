@@ -85,6 +85,26 @@ export default function Dashboard() {
         <p className="text-gray-600">Aqui está sua visão geral financeira</p>
       </div>
 
+      <Link
+        href="/dashboard/plano"
+        className="group block overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-xl md:p-8"
+      >
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="max-w-2xl">
+            <span className="inline-flex rounded-full bg-emerald-400/15 px-3 py-1 text-sm font-semibold text-emerald-300">
+              Seu caminho para a liberdade financeira
+            </span>
+            <h2 className="mt-4 text-2xl font-bold md:text-3xl">Descubra quando você sairá do vermelho</h2>
+            <p className="mt-2 text-slate-300">
+              Veja a melhor ordem para quitar suas dívidas, simule valores extras e transforme parcelas em reserva depois da quitação.
+            </p>
+          </div>
+          <span className="inline-flex items-center justify-center rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 transition-transform group-hover:translate-x-1">
+            Criar meu plano →
+          </span>
+        </div>
+      </Link>
+
       {/* Diagnóstico CTA — destaque principal */}
       <Link
         href="/dashboard/diagnostico"

@@ -16,6 +16,20 @@ export type PayoffResult = {
   reason?: 'insufficient-payment' | 'simulation-limit'
 }
 
+export function addMonthsToDate(months: number, from = new Date()) {
+  const date = new Date(from)
+  date.setDate(1)
+  date.setMonth(date.getMonth() + Math.max(0, months))
+  return date
+}
+
+export function formatPayoffDate(months: number, from = new Date()) {
+  return addMonthsToDate(months, from).toLocaleDateString('pt-BR', {
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
 const MONEY_EPSILON = 0.005
 
 export function formatCurrency(value: number) {
@@ -130,4 +144,3 @@ export function simulatePayoffPlan(
     reason: 'simulation-limit',
   }
 }
-
