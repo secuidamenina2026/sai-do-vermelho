@@ -16,7 +16,7 @@ export function Sidebar() {
     { href: '/dashboard/plano', label: '🚀 Meu Plano', icon: '🚀' },
     { href: '/dashboard/metas', label: '🎯 Metas', icon: '🎯' },
     { href: '/dashboard/ia', label: '🤖 Consultoria IA', icon: '🤖' },
-    { href: '/dashboard/resumo', label: '📈 Resumo', icon: '📈' },
+    { href: '/dashboard/resumo', label: '✨ Diagnóstico Mensal', icon: '✨' },
   ]
 
   return (

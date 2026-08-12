@@ -246,6 +246,15 @@ export default function Dashboard() {
           <p className="text-sm text-gray-600">Receba recomendações personalizadas</p>
         </Link>
       </div>
+
+      <Link href="/dashboard/resumo" className="card flex flex-col gap-4 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50 transition-shadow hover:shadow-md md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-wide text-purple-700">✨ Diagnóstico mensal inteligente</p>
+          <h2 className="mt-1 text-xl font-bold">Veja sua vitória, seu alerta e sua próxima missão</h2>
+          <p className="mt-1 text-sm text-gray-600">O sistema transforma seus números em uma decisão clara para os próximos sete dias.</p>
+        </div>
+        <span className="whitespace-nowrap font-bold text-purple-700">Analisar meu mês →</span>
+      </Link>
     </div>
   )
 }
