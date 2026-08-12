@@ -130,7 +130,7 @@ export default function Register() {
 
         <p className="text-center text-xs text-gray-500 mt-4">
           Ao criar conta, você concorda com nossos{' '}
-          <Link href="#" className="hover:underline">
+          <Link href="/termos" className="hover:underline">
             Termos de Serviço
           </Link>
         </p>

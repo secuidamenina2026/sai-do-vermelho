@@ -2,9 +2,23 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import {
+  CATEGORY_GROUPS,
+  EXPENSE_CATEGORIES,
+  getExpenseCategoryLabel,
+} from '@/lib/expense-categories'
+import { formatCurrency } from '@/lib/financial'
+
+type Expense = {
+  id: string
+  category: string
+  actual_amount: number
+  notes: string | null
+  created_at: string
+}
 
 export default function Expenses() {
-  const [expenses, setExpenses] = useState<any[]>([])
+  const [expenses, setExpenses] = useState<Expense[]>([])
   const [budget, setBudget] = useState<any>(null)
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -13,17 +27,6 @@ export default function Expenses() {
     actual_amount: '',
     notes: '',
   })
-
-  const categories = [
-    'mercado',
-    'moradia',
-    'transporte',
-    'lazer',
-    'delivery',
-    'saúde',
-    'educação',
-    'outro',
-  ]
 
   useEffect(() => {
     loadExpenses()
@@ -111,7 +114,8 @@ export default function Expenses() {
   }
 
   const totalExpenses = expenses.reduce((sum, exp) => sum + (exp.actual_amount || 0), 0)
-  const categoryTotals = categories.map((cat) => ({
+  const categoriesInUse = Array.from(new Set(expenses.map((expense) => expense.category)))
+  const categoryTotals = categoriesInUse.map((cat) => ({
     category: cat,
     total: expenses
       .filter((e) => e.category === cat)
@@ -128,7 +132,7 @@ export default function Expenses() {
       <div className="grid md:grid-cols-4 gap-4">
         <div className="card">
           <p className="text-gray-600 text-sm">Total Gasto</p>
-          <p className="text-3xl font-bold text-red-600">R$ {totalExpenses.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-red-600">{formatCurrency(totalExpenses)}</p>
         </div>
         {budget && (
           <>
@@ -165,10 +169,14 @@ export default function Expenses() {
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="input"
                 >
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                    </option>
+                  {CATEGORY_GROUPS.map((group) => (
+                    <optgroup key={group} label={group}>
+                      {EXPENSE_CATEGORIES.filter((category) => category.group === group).map((category) => (
+                        <option key={category.value} value={category.value}>
+                          {category.label}
+                        </option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </div>
@@ -217,8 +225,8 @@ export default function Expenses() {
               .sort((a, b) => b.total - a.total)
               .map((cat) => (
                 <div key={cat.category} className="flex justify-between items-center">
-                  <span className="capitalize">{cat.category}</span>
-                  <span className="font-bold">R$ {cat.total.toFixed(2)}</span>
+                  <span>{getExpenseCategoryLabel(cat.category)}</span>
+                  <span className="font-bold">{formatCurrency(cat.total)}</span>
                 </div>
               ))}
             {categoryTotals.every((cat) => cat.total === 0) && (
@@ -248,10 +256,10 @@ export default function Expenses() {
                   <td className="py-3">
                     {new Date(expense.created_at).toLocaleDateString('pt-BR')}
                   </td>
-                  <td className="py-3 capitalize">{expense.category}</td>
+                  <td className="py-3">{getExpenseCategoryLabel(expense.category)}</td>
                   <td className="py-3 text-sm text-gray-600">{expense.notes}</td>
                   <td className="py-3 text-right font-bold">
-                    R$ {expense.actual_amount?.toFixed(2)}
+                    {formatCurrency(expense.actual_amount || 0)}
                   </td>
                   <td className="py-3 text-right">
                     <button

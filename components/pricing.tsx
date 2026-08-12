@@ -25,7 +25,7 @@ export function Pricing() {
         'Teste de Orçamento (3 perguntas)',
         'Cálculo 50-30-20 personalizado',
         '1 sugestão IA por categoria',
-        'Exportar PDF simples',
+        'Diagnóstico financeiro com plano inicial',
       ],
       cta: 'Comece Grátis',
       ctaHref: '/auth/register',
@@ -39,13 +39,12 @@ export function Pricing() {
       features: [
         'Tudo do Free +',
         'Consultoria IA ilimitada 24/7 por chat',
-        'Orçamento completo 50-30-20 automático',
-        'Rastreio de gastos por categoria',
-        'Calculadora de dívidas (bola de neve)',
-        'Metas inteligentes (IA sugere)',
-        'Alertas automáticos',
-        'Histórico de 12 meses',
-        'Relatórios completos',
+        'Orçamento adaptativo para sua fase financeira',
+        'Rastreio de gastos com categorias detalhadas',
+        'Simulador de dívidas com juros compostos',
+        'Estratégias bola de neve e avalanche',
+        'Metas financeiras acompanhadas',
+        'Resumo completo do mês',
       ],
       cta: 'Assinar o Plano Completo',
       ctaHref: 'https://pay.kiwify.com.br/1XzR7vC',
@@ -57,7 +56,7 @@ export function Pricing() {
     <div className="container max-w-5xl">
       <h2 className="text-3xl font-bold text-center mb-4">Preços Simples e Transparentes</h2>
       <p className="text-center text-gray-600 mb-12">
-        Sem taxas ocultas. Cancele quando quiser. Garantia 30 dias.
+        Sem taxas ocultas. Cancele quando quiser. Garantia de 7 dias.
       </p>
 
       <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">

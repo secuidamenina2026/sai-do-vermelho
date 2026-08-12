@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { formatCurrency, parseMoney, simulatePayoffPlan } from '@/lib/financial'
 
 const KIWIFY_PRO = 'https://pay.kiwify.com.br/1XzR7vC'
 
@@ -14,7 +15,7 @@ const TIPOS_DIVIDA = [
   '📱 Outro',
 ]
 
-type Divida = { tipo: string; valor: number; parcela: number }
+type Divida = { tipo: string; valor: number; parcela: number; juros: number }
 
 export default function Diagnostico() {
   const [etapa, setEtapa] = useState(1)
@@ -23,17 +24,29 @@ export default function Diagnostico() {
   const [tipoAtual, setTipoAtual] = useState(TIPOS_DIVIDA[0])
   const [valorAtual, setValorAtual] = useState('')
   const [parcelaAtual, setParcelaAtual] = useState('')
+  const [jurosAtual, setJurosAtual] = useState('')
   const [salvando, setSalvando] = useState(false)
 
-  const rendaNum = parseFloat(renda.replace(',', '.')) || 0
+  const rendaNum = parseMoney(renda)
   const totalDividas = dividas.reduce((s, d) => s + d.valor, 0)
   const totalParcelas = dividas.reduce((s, d) => s + d.parcela, 0)
   const comprometimento = rendaNum > 0 ? (totalParcelas / rendaNum) * 100 : 0
   const verba20 = rendaNum * 0.2
-  const mesesQuitar = verba20 > 0 ? Math.ceil(totalDividas / verba20) : 0
+  const verbaQuitacao = Math.max(verba20, totalParcelas)
+  const simulacao = simulatePayoffPlan(
+    dividas.map((divida, index) => ({
+      id: `${divida.tipo}-${index}`,
+      name: divida.tipo,
+      balance: divida.valor,
+      monthlyInterestRate: divida.juros,
+      minimumPayment: divida.parcela,
+    })),
+    verbaQuitacao,
+  )
 
-  const nivel =
-    comprometimento >= 30 || totalDividas > rendaNum * 6
+  const nivel = totalDividas === 0
+    ? { cor: 'green', emoji: '🟢', titulo: 'SEM DÍVIDAS INFORMADAS', frase: 'Seu próximo passo é organizar o orçamento e construir sua reserva de segurança.' }
+    : comprometimento >= 30 || totalDividas > rendaNum * 6
       ? { cor: 'red', emoji: '🔴', titulo: 'VERMELHO CRÍTICO', frase: 'Suas dívidas estão consumindo sua renda. Agir agora faz toda a diferença.' }
       : comprometimento >= 15 || totalDividas > rendaNum * 2
       ? { cor: 'yellow', emoji: '🟡', titulo: 'SINAL DE ALERTA', frase: 'Ainda dá para virar o jogo rápido — com método, em poucos meses o cenário muda.' }
@@ -42,12 +55,14 @@ export default function Diagnostico() {
   const ordemAtaque = [...dividas].sort((a, b) => a.valor - b.valor)
 
   const addDivida = () => {
-    const v = parseFloat(valorAtual.replace(',', '.'))
+    const v = parseMoney(valorAtual)
     if (!v || v <= 0) return
-    const p = parseFloat(parcelaAtual.replace(',', '.')) || 0
-    setDividas([...dividas, { tipo: tipoAtual, valor: v, parcela: p }])
+    const p = parseMoney(parcelaAtual)
+    const j = parseMoney(jurosAtual)
+    setDividas([...dividas, { tipo: tipoAtual, valor: v, parcela: p, juros: j }])
     setValorAtual('')
     setParcelaAtual('')
+    setJurosAtual('')
   }
 
   const gerarRelatorio = async () => {
@@ -62,6 +77,7 @@ export default function Diagnostico() {
             user_id: user.id,
             creditor: d.tipo.replace(/^[^ ]+ /, ''),
             total_amount: d.valor,
+            monthly_interest_rate: d.juros,
             monthly_payment: d.parcela || null,
             is_paid: false,
           })
@@ -76,9 +92,6 @@ export default function Diagnostico() {
       setSalvando(false)
     }
   }
-
-  const fmt = (n: number) =>
-    n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
   return (
     <div className="max-w-xl mx-auto">
@@ -98,7 +111,7 @@ export default function Diagnostico() {
       {etapa === 1 && (
         <div className="card space-y-4">
           <h2 className="text-lg font-bold">Qual é a sua renda mensal?</h2>
-          <p className="text-sm text-gray-500">Pode ser aproximada. Ninguém além de você vê isso.</p>
+          <p className="text-sm text-gray-500">Informe a renda líquida: o valor que realmente entra na sua conta.</p>
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-gray-500">R$</span>
             <input
@@ -166,6 +179,20 @@ export default function Diagnostico() {
                 placeholder="Ex: 300"
               />
             </div>
+            <div>
+              <label className="label">Taxa de juros ao mês (opcional)</label>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={jurosAtual}
+                onChange={(e) => setJurosAtual(e.target.value)}
+                className="input"
+                placeholder="Ex: 12,5"
+                min="0"
+                step="0.01"
+              />
+              <p className="text-xs text-gray-500 mt-1">Você encontra essa taxa na fatura ou no contrato.</p>
+            </div>
             <button onClick={addDivida} className="btn btn-secondary w-full py-3">
               + Adicionar esta dívida
             </button>
@@ -178,7 +205,7 @@ export default function Diagnostico() {
                 {dividas.map((d, i) => (
                   <li key={i} className="flex justify-between items-center text-sm border-b border-gray-100 pb-2">
                     <span>{d.tipo}</span>
-                    <span className="font-bold">{fmt(d.valor)}</span>
+                    <span className="font-bold">{formatCurrency(d.valor)}</span>
                     <button
                       onClick={() => setDividas(dividas.filter((_, j) => j !== i))}
                       className="text-red-500 text-xs"
@@ -223,7 +250,7 @@ export default function Diagnostico() {
           <div className="grid grid-cols-2 gap-3">
             <div className="card text-center">
               <p className="text-xs text-gray-500 mb-1">Total de dívidas</p>
-              <p className="text-xl font-extrabold text-red-600">{fmt(totalDividas)}</p>
+              <p className="text-xl font-extrabold text-red-600">{formatCurrency(totalDividas)}</p>
             </div>
             <div className="card text-center">
               <p className="text-xs text-gray-500 mb-1">Renda comprometida</p>
@@ -240,14 +267,26 @@ export default function Diagnostico() {
                   <li key={i} className="flex items-center gap-3 text-sm">
                     <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</span>
                     <span className="flex-1">{d.tipo}</span>
-                    <span className="font-bold">{fmt(d.valor)}</span>
+                    <span className="font-bold">{formatCurrency(d.valor)}</span>
                   </li>
                 ))}
               </ol>
-              {mesesQuitar > 0 && (
+              {simulacao.months !== null && simulacao.months > 0 && (
                 <p className="text-sm mt-4 bg-blue-50 rounded-lg p-3">
-                  💡 Destinando <b>20% da sua renda</b> ({fmt(verba20)}/mês), você quita tudo em
-                  aproximadamente <b>{mesesQuitar} {mesesQuitar === 1 ? 'mês' : 'meses'}</b>.
+                  💡 Com um orçamento de <b>{formatCurrency(simulacao.monthlyBudget)}/mês</b>, a simulação
+                  indica quitação em aproximadamente <b>{simulacao.months} {simulacao.months === 1 ? 'mês' : 'meses'}</b>,
+                  com cerca de <b>{formatCurrency(simulacao.totalInterest)}</b> em juros.
+                </p>
+              )}
+              {simulacao.months === null && (
+                <p className="text-sm mt-4 bg-red-50 text-red-800 rounded-lg p-3">
+                  ⚠️ O pagamento informado não reduz a dívida com segurança. Revise as taxas e busque uma
+                  renegociação antes de assumir uma data de quitação.
+                </p>
+              )}
+              {dividas.some((d) => d.juros === 0) && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Estimativa: dívidas sem taxa informada foram calculadas com juros de 0% ao mês.
                 </p>
               )}
             </div>

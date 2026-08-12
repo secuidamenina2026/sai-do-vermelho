@@ -10,10 +10,10 @@ export default function Home() {
       <section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Organize sua vida financeira em 5 minutos
+            Seu GPS para sair das dívidas e construir sua primeira reserva
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Use grátis, escale com IA. Descubra quanto você pode poupar com nosso sistema 50-30-20.
+            Descubra o próximo passo, organize seus gastos e acompanhe sua evolução do vermelho até uma vida financeira mais segura.
           </p>
           <div className="flex gap-4 justify-center">
             <Link href="/auth/register" className="btn btn-primary text-lg px-8 py-3">
@@ -36,7 +36,7 @@ export default function Home() {
               <div className="text-4xl mb-4">📊</div>
               <h3 className="text-xl font-bold mb-2">Orçamento Inteligente</h3>
               <p className="text-gray-600">
-                Método 50-30-20: 50% essenciais, 30% desejos, 20% poupança. Totalmente personalizado para sua renda.
+                O 50-30-20 se adapta: quem tem dívidas recebe um plano temporário de recuperação.
               </p>
             </div>
 
@@ -76,7 +76,7 @@ export default function Home() {
               <div className="text-4xl mb-4">📈</div>
               <h3 className="text-xl font-bold mb-2">Relatórios Detalhados</h3>
               <p className="text-gray-600">
-                Exporte PDF e analise tendências. Veja seu progresso mês a mês com gráficos inteligentes.
+                Acompanhe renda, gastos, dívidas e metas em uma visão financeira única.
               </p>
             </div>
           </div>
@@ -86,20 +86,20 @@ export default function Home() {
       {/* Proof Section */}
       <section className="py-20 bg-gray-50">
         <div className="container max-w-4xl text-center">
-          <h2 className="text-3xl font-bold mb-12">O Que Conseguem Nossos Usuários</h2>
+          <h2 className="text-3xl font-bold mb-12">Uma jornada com começo, meio e conquista</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <div className="text-4xl font-bold text-green-600">R$ 5k</div>
-              <p className="text-gray-600 mt-2">poupados por ano em média</p>
+              <div className="text-4xl font-bold text-red-600">1. Diagnosticar</div>
+              <p className="text-gray-600 mt-2">Entenda o tamanho real das dívidas e o comprometimento da renda.</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600">45%</div>
-              <p className="text-gray-600 mt-2">redução em gastos supérfluos</p>
+              <div className="text-4xl font-bold text-blue-600">2. Organizar</div>
+              <p className="text-gray-600 mt-2">Controle despesas e siga uma ordem clara de pagamento.</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-purple-600">3 meses</div>
-              <p className="text-gray-600 mt-2">para sair do vermelho</p>
+              <div className="text-4xl font-bold text-green-600">3. Construir</div>
+              <p className="text-gray-600 mt-2">Forme sua reserva e avance para metas e investimentos.</p>
             </div>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function Home() {
         <div className="container max-w-2xl text-center text-white">
           <h2 className="text-3xl font-bold mb-4">Pronto para Transformar suas Finanças?</h2>
           <p className="text-xl mb-8 opacity-90">
-            Garantia 30 dias. Se não gostar, devolvemos seu dinheiro.
+            Comece gratuitamente. No plano completo, você tem garantia de 7 dias.
           </p>
           <Link href="/auth/register" className="btn bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-3">
             Comece Agora → Grátis

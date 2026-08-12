@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { formatCurrency } from '@/lib/financial'
 
 export default function Budget() {
   const [budget, setBudget] = useState<any>(null)
   const [income, setIncome] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [hasActiveDebts, setHasActiveDebts] = useState(false)
 
   useEffect(() => {
     const loadBudget = async () => {
@@ -15,12 +17,21 @@ export default function Budget() {
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
           const currentMonth = new Date().toISOString().split('T')[0].slice(0, 7) + '-01'
-          const { data } = await supabase
-            .from('monthly_budgets')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('month', currentMonth)
-            .single()
+          const [{ data }, { count: activeDebtCount }] = await Promise.all([
+            supabase
+              .from('monthly_budgets')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('month', currentMonth)
+              .single(),
+            supabase
+              .from('debts')
+              .select('*', { count: 'exact', head: true })
+              .eq('user_id', user.id)
+              .eq('is_paid', false),
+          ])
+
+          setHasActiveDebts((activeDebtCount || 0) > 0)
 
           if (data) {
             setBudget(data)
@@ -43,9 +54,12 @@ export default function Budget() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const incomeValue = parseFloat(income) || 0
-        const essentials = incomeValue * 0.5
-        const desires = incomeValue * 0.3
-        const savings = incomeValue * 0.2
+        const essentialsRate = hasActiveDebts ? 0.6 : 0.5
+        const desiresRate = hasActiveDebts ? 0.1 : 0.3
+        const savingsRate = hasActiveDebts ? 0.3 : 0.2
+        const essentials = incomeValue * essentialsRate
+        const desires = incomeValue * desiresRate
+        const savings = incomeValue * savingsRate
 
         const currentMonth = new Date().toISOString().split('T')[0].slice(0, 7) + '-01'
         
@@ -92,18 +106,34 @@ export default function Budget() {
   }
 
   const incomeValue = parseFloat(income) || 0
-  const essentials = incomeValue * 0.5
-  const desires = incomeValue * 0.3
-  const savings = incomeValue * 0.2
+  const essentialsRate = hasActiveDebts ? 0.6 : 0.5
+  const desiresRate = hasActiveDebts ? 0.1 : 0.3
+  const savingsRate = hasActiveDebts ? 0.3 : 0.2
+  const essentials = incomeValue * essentialsRate
+  const desires = incomeValue * desiresRate
+  const savings = incomeValue * savingsRate
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold mb-2">📊 Seu Orçamento 50-30-20</h1>
+        <h1 className="text-3xl font-bold mb-2">📊 Seu Plano Financeiro</h1>
         <p className="text-gray-600">
-          O método 50-30-20: dedique 50% à essenciais, 30% a desejos e 20% à poupança.
+          {hasActiveDebts
+            ? 'Modo recuperação ativo: proteja o essencial e acelere a saída das dívidas.'
+            : 'Método 50-30-20: necessidades, desejos e construção do seu futuro.'}
         </p>
       </div>
+
+      {hasActiveDebts && (
+        <div className="card border-amber-300 bg-amber-50">
+          <h2 className="font-bold mb-2">🛟 Plano temporário 60-10-30</h2>
+          <p className="text-sm text-gray-700">
+            Enquanto houver dívidas ativas, o sistema reserva 60% para necessidades, reduz desejos para 10%
+            e direciona 30% para quitação e uma pequena proteção contra imprevistos. Ao quitar as dívidas,
+            o orçamento retorna ao 50-30-20.
+          </p>
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Input Section */}
@@ -121,7 +151,7 @@ export default function Budget() {
                 placeholder="0,00"
               />
               <p className="text-xs text-gray-500 mt-2">
-                Inclua seu salário ou renda total do mês (antes de descontos)
+                Informe a renda líquida: o valor que realmente fica disponível após os descontos.
               </p>
             </div>
 
@@ -140,9 +170,9 @@ export default function Budget() {
           {/* Essentials */}
           <div className="card">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-bold">🏠 Essenciais (50%)</h3>
+              <h3 className="text-lg font-bold">🏠 Essenciais ({essentialsRate * 100}%)</h3>
               <span className="text-2xl font-bold text-green-600">
-                R$ {essentials.toFixed(2)}
+                {formatCurrency(essentials)}
               </span>
             </div>
             <p className="text-sm text-gray-600">
@@ -151,7 +181,7 @@ export default function Budget() {
             <div className="mt-3 bg-gray-200 rounded-full h-3">
               <div 
                 className="bg-green-600 h-3 rounded-full" 
-                style={{ width: '50%' }}
+                style={{ width: `${essentialsRate * 100}%` }}
               ></div>
             </div>
           </div>
@@ -159,9 +189,9 @@ export default function Budget() {
           {/* Desires */}
           <div className="card">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-bold">🎉 Desejos (30%)</h3>
+              <h3 className="text-lg font-bold">🎉 Desejos ({desiresRate * 100}%)</h3>
               <span className="text-2xl font-bold text-blue-600">
-                R$ {desires.toFixed(2)}
+                {formatCurrency(desires)}
               </span>
             </div>
             <p className="text-sm text-gray-600">
@@ -170,7 +200,7 @@ export default function Budget() {
             <div className="mt-3 bg-gray-200 rounded-full h-3">
               <div 
                 className="bg-blue-600 h-3 rounded-full" 
-                style={{ width: '30%' }}
+                style={{ width: `${desiresRate * 100}%` }}
               ></div>
             </div>
           </div>
@@ -178,18 +208,22 @@ export default function Budget() {
           {/* Savings */}
           <div className="card">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-bold">💰 Poupança (20%)</h3>
+              <h3 className="text-lg font-bold">
+                {hasActiveDebts ? '📉 Quitação e proteção' : '💰 Futuro'} ({savingsRate * 100}%)
+              </h3>
               <span className="text-2xl font-bold text-purple-600">
-                R$ {savings.toFixed(2)}
+                {formatCurrency(savings)}
               </span>
             </div>
             <p className="text-sm text-gray-600">
-              Investimentos, fundo de emergência, aplicações
+              {hasActiveDebts
+                ? 'Pagamento acelerado de dívidas e uma pequena reserva contra imprevistos'
+                : 'Reserva de emergência, metas e investimentos'}
             </p>
             <div className="mt-3 bg-gray-200 rounded-full h-3">
               <div 
                 className="bg-purple-600 h-3 rounded-full" 
-                style={{ width: '20%' }}
+                style={{ width: `${savingsRate * 100}%` }}
               ></div>
             </div>
           </div>
@@ -202,7 +236,7 @@ export default function Budget() {
         <ul className="space-y-2 text-sm text-gray-700">
           <li>✓ Se seus essenciais excederem 50%, considere reduzir custos fixos</li>
           <li>✓ A categoria desejos é onde você pode fazer cortes se precisar economizar</li>
-          <li>✓ Mantenha a poupança em 20% mesmo que seja pequeno o valor inicial</li>
+          <li>✓ Antes de investir, proteja as despesas essenciais e elimine dívidas caras</li>
           <li>✓ Revise este orçamento mensalmente para acompanhar mudanças</li>
         </ul>
       </div>

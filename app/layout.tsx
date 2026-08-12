@@ -4,7 +4,7 @@ import '@/styles/globals.css'
 
 export const metadata: Metadata = {
   title: 'Sai do Vermelho - Sua Jornada Financeira',
-  description: 'Organize sua vida financeira em 5 minutos. Use grátis, escale com IA.',
+  description: 'Seu GPS para sair das dívidas, organizar os gastos e construir sua primeira reserva.',
 }
 
 export default function RootLayout({

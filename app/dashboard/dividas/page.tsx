@@ -2,9 +2,20 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { formatCurrency, simulatePayoffPlan, type PayoffStrategy } from '@/lib/financial'
+
+type Debt = {
+  id: string
+  creditor: string
+  total_amount: number
+  monthly_interest_rate: number | null
+  monthly_payment: number | null
+  priority_order: number | null
+}
 
 export default function Debts() {
-  const [debts, setDebts] = useState<any[]>([])
+  const [debts, setDebts] = useState<Debt[]>([])
+  const [strategy, setStrategy] = useState<PayoffStrategy>('snowball')
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(true)
   const [formData, setFormData] = useState({
@@ -104,31 +115,88 @@ export default function Debts() {
 
   const totalDebt = debts.reduce((sum, d) => sum + (d.total_amount || 0), 0)
   const totalMonthlyPayment = debts.reduce((sum, d) => sum + (d.monthly_payment || 0), 0)
+  const payoff = simulatePayoffPlan(
+    debts.map((debt) => ({
+      id: debt.id,
+      name: debt.creditor,
+      balance: debt.total_amount,
+      monthlyInterestRate: debt.monthly_interest_rate || 0,
+      minimumPayment: debt.monthly_payment || 0,
+    })),
+    totalMonthlyPayment,
+    strategy,
+  )
+  const orderedDebts = [...debts].sort((a, b) =>
+    strategy === 'avalanche'
+      ? (b.monthly_interest_rate || 0) - (a.monthly_interest_rate || 0) || a.total_amount - b.total_amount
+      : a.total_amount - b.total_amount || (b.monthly_interest_rate || 0) - (a.monthly_interest_rate || 0),
+  )
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">💳 Gestor de Dívidas</h1>
         <p className="text-gray-600">
-          Sistema "Bola de Neve": pague juros + mínimo nas grandes e apenas mínimo nas pequenas.
-          Quando uma é quitada, todos os pagamentos vão para a próxima.
+          Pague o mínimo de todas e direcione todo valor extra para uma dívida por vez.
+          Escolha entre vitórias rápidas ou menor custo de juros.
         </p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">
         <div className="card">
           <p className="text-gray-600 text-sm">Dívida Total</p>
-          <p className="text-3xl font-bold text-red-600">R$ {totalDebt.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-red-600">{formatCurrency(totalDebt)}</p>
         </div>
         <div className="card">
           <p className="text-gray-600 text-sm">Pagamento Mensal Total</p>
-          <p className="text-3xl font-bold">R$ {totalMonthlyPayment.toFixed(2)}</p>
+          <p className="text-3xl font-bold">{formatCurrency(totalMonthlyPayment)}</p>
         </div>
         <div className="card">
           <p className="text-gray-600 text-sm">Dívidas Ativas</p>
           <p className="text-3xl font-bold">{debts.length}</p>
         </div>
       </div>
+
+      {debts.length > 0 && (
+        <div className="card border-blue-200 bg-blue-50">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="font-bold text-lg">Escolha sua estratégia</h2>
+              <p className="text-sm text-gray-600">
+                A ordem abaixo muda automaticamente conforme sua escolha.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setStrategy('snowball')}
+                className={`btn text-sm ${strategy === 'snowball' ? 'btn-primary' : 'btn-secondary'}`}
+              >
+                ❄️ Bola de neve
+              </button>
+              <button
+                onClick={() => setStrategy('avalanche')}
+                className={`btn text-sm ${strategy === 'avalanche' ? 'btn-primary' : 'btn-secondary'}`}
+              >
+                🏔️ Avalanche
+              </button>
+            </div>
+          </div>
+          <p className="text-sm mt-4">
+            {strategy === 'snowball'
+              ? 'Prioriza o menor saldo para gerar vitórias rápidas.'
+              : 'Prioriza a maior taxa para reduzir o total de juros.'}
+          </p>
+          {payoff.months !== null ? (
+            <p className="mt-3 font-medium">
+              Previsão: <b>{payoff.months} meses</b> · Juros estimados: <b>{formatCurrency(payoff.totalInterest)}</b>
+            </p>
+          ) : (
+            <p className="mt-3 text-red-700 font-medium">
+              O pagamento mensal atual não é suficiente para gerar uma previsão segura de quitação.
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Add Debt Form */}
       <div className="card">
@@ -211,15 +279,14 @@ export default function Debts() {
             <p>Você não tem dívidas ativas. Continue assim! 💪</p>
           </div>
         ) : (
-          debts.map((debt, index) => {
-            const monthsToPayOff = debt.monthly_payment > 0 
-              ? Math.ceil(debt.total_amount / debt.monthly_payment)
-              : '∞'
-            const progress = Math.min(
-              ((debt.monthly_payment * (index + 1)) / debt.total_amount) * 100,
-              100
-            )
-
+          orderedDebts.map((debt, index) => {
+            const individual = simulatePayoffPlan([{
+              id: debt.id,
+              name: debt.creditor,
+              balance: debt.total_amount,
+              monthlyInterestRate: debt.monthly_interest_rate || 0,
+              minimumPayment: debt.monthly_payment || 0,
+            }], debt.monthly_payment || 0, strategy)
             return (
               <div key={debt.id} className="card">
                 <div className="flex justify-between items-start mb-4">
@@ -231,24 +298,20 @@ export default function Debts() {
                       <h3 className="text-xl font-bold">{debt.creditor}</h3>
                     </div>
                     <p className="text-sm text-gray-600">
-                      {debt.monthly_interest_rate}% a.m. | Pagamento mensal: R$ {debt.monthly_payment.toFixed(2)}
+                      {debt.monthly_interest_rate || 0}% a.m. | Pagamento mensal: {formatCurrency(debt.monthly_payment || 0)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold">R$ {debt.total_amount.toFixed(2)}</p>
-                    <p className="text-xs text-gray-500">~{monthsToPayOff} meses</p>
+                    <p className="text-2xl font-bold">{formatCurrency(debt.total_amount)}</p>
+                    <p className="text-xs text-gray-500">
+                      {individual.months === null ? 'parcela insuficiente' : `~${individual.months} meses isoladamente`}
+                    </p>
                   </div>
                 </div>
 
-                <div className="mb-4">
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div 
-                      className="bg-blue-600 h-3 rounded-full" 
-                      style={{ width: `${progress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">{progress.toFixed(0)}% prioridade</p>
-                </div>
+                <p className="text-sm mb-4 bg-gray-50 rounded-lg p-3">
+                  Prioridade #{index + 1} no método {strategy === 'snowball' ? 'bola de neve' : 'avalanche'}.
+                </p>
 
                 <div className="flex gap-2">
                   <button
