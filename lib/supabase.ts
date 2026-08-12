@@ -84,12 +84,24 @@ export type Database = {
           user_id: string
           creditor: string
           total_amount: number
+          original_amount: number
           monthly_interest_rate: number | null
           monthly_payment: number | null
           priority_order: number | null
           is_paid: boolean
           created_at: string
           updated_at: string
+        }
+      }
+      debt_payments: {
+        Row: {
+          id: string
+          user_id: string
+          debt_id: string
+          amount: number
+          paid_at: string
+          notes: string | null
+          created_at: string
         }
       }
       goals: {

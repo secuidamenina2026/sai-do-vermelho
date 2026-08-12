@@ -121,9 +121,13 @@ CREATE POLICY "Users can view own debts" ON debts
 CREATE POLICY "Users can create debts" ON debts
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update own debts" ON debts
-  FOR UPDATE USING (auth.uid() = user_id);
+  FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can delete own debts" ON debts
   FOR DELETE USING (auth.uid() = user_id);
+
+-- O rastreamento de pagamentos é adicionado pela migration add_debt_payment_tracking.
+-- Ela cria debt_payments, a coluna debts.original_amount e a função atômica
+-- record_debt_payment para reduzir o saldo e salvar o histórico juntos.
 
 -- ============================================================================
 -- 5. TABELA: goals

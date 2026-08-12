@@ -8,9 +8,18 @@ type Debt = {
   id: string
   creditor: string
   total_amount: number
+  original_amount: number
   monthly_interest_rate: number | null
   monthly_payment: number | null
   priority_order: number | null
+}
+
+type DebtPayment = {
+  id: string
+  debt_id: string
+  amount: number
+  paid_at: string
+  notes: string | null
 }
 
 export default function Debts() {
@@ -18,6 +27,12 @@ export default function Debts() {
   const [strategy, setStrategy] = useState<PayoffStrategy>('snowball')
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [payments, setPayments] = useState<DebtPayment[]>([])
+  const [paymentDebt, setPaymentDebt] = useState<Debt | null>(null)
+  const [paymentAmount, setPaymentAmount] = useState('')
+  const [paymentNotes, setPaymentNotes] = useState('')
+  const [savingPayment, setSavingPayment] = useState(false)
+  const [celebration, setCelebration] = useState('')
   const [formData, setFormData] = useState({
     creditor: '',
     total_amount: '',
@@ -33,21 +48,63 @@ export default function Debts() {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const { data } = await supabase
-          .from('debts')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('is_paid', false)
-          .order('priority_order', { ascending: true })
+        const [{ data }, { data: paymentData }] = await Promise.all([
+          supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false).order('priority_order', { ascending: true }),
+          supabase.from('debt_payments').select('*').eq('user_id', user.id).order('paid_at', { ascending: false }).limit(50),
+        ])
 
         if (data) {
           setDebts(data)
         }
+        if (paymentData) setPayments(paymentData)
       }
     } catch (error) {
       console.error('Error loading debts:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePayment = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!paymentDebt) return
+    const amount = Number(paymentAmount)
+    if (!amount || amount <= 0 || amount > paymentDebt.total_amount) return
+
+    setSavingPayment(true)
+    try {
+      const { data, error } = await supabase.rpc('record_debt_payment', {
+        p_debt_id: paymentDebt.id,
+        p_amount: amount,
+        p_notes: paymentNotes,
+      })
+      if (error) throw error
+
+      if (data?.is_paid) {
+        setDebts((current) => current.filter((debt) => debt.id !== paymentDebt.id))
+        setCelebration(`Parabéns! Você quitou ${paymentDebt.creditor}!`)
+      } else {
+        setDebts((current) => current.map((debt) => debt.id === paymentDebt.id
+          ? { ...debt, total_amount: Number(data.new_balance) }
+          : debt))
+        setCelebration(`${formatCurrency(amount)} abatidos. Você está mais perto da liberdade!`)
+      }
+
+      setPayments((current) => [{
+        id: data.payment_id,
+        debt_id: paymentDebt.id,
+        amount,
+        paid_at: new Date().toISOString(),
+        notes: paymentNotes || null,
+      }, ...current])
+      setPaymentDebt(null)
+      setPaymentAmount('')
+      setPaymentNotes('')
+    } catch (error) {
+      console.error('Error recording payment:', error)
+      alert('Não foi possível registrar o pagamento. Confira o valor e tente novamente.')
+    } finally {
+      setSavingPayment(false)
     }
   }
 
@@ -141,6 +198,15 @@ export default function Debts() {
           Escolha entre vitórias rápidas ou menor custo de juros.
         </p>
       </div>
+
+      {celebration && (
+        <div className="rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 p-5 text-white shadow-lg" role="status">
+          <div className="flex items-center justify-between gap-4">
+            <div><p className="text-2xl">🎉</p><p className="font-bold">{celebration}</p></div>
+            <button onClick={() => setCelebration('')} aria-label="Fechar comemoração" className="rounded-lg bg-white/15 px-3 py-2">✕</button>
+          </div>
+        </div>
+      )}
 
       <div className="grid md:grid-cols-3 gap-4">
         <div className="card">
@@ -287,6 +353,10 @@ export default function Debts() {
               monthlyInterestRate: debt.monthly_interest_rate || 0,
               minimumPayment: debt.monthly_payment || 0,
             }], debt.monthly_payment || 0, strategy)
+            const originalAmount = Math.max(debt.original_amount || debt.total_amount, debt.total_amount)
+            const paidAmount = Math.max(0, originalAmount - debt.total_amount)
+            const progress = originalAmount > 0 ? Math.min(100, (paidAmount / originalAmount) * 100) : 0
+            const debtPayments = payments.filter((payment) => payment.debt_id === debt.id)
             return (
               <div key={debt.id} className="card">
                 <div className="flex justify-between items-start mb-4">
@@ -313,12 +383,39 @@ export default function Debts() {
                   Prioridade #{index + 1} no método {strategy === 'snowball' ? 'bola de neve' : 'avalanche'}.
                 </p>
 
+                <div className="mb-5">
+                  <div className="mb-2 flex justify-between text-sm">
+                    <span className="font-medium">Progresso da quitação</span>
+                    <span>{progress.toFixed(0)}% · {formatCurrency(paidAmount)} pagos</span>
+                  </div>
+                  <div className="h-3 overflow-hidden rounded-full bg-gray-200">
+                    <div className="h-full rounded-full bg-gradient-to-r from-blue-600 to-emerald-500 transition-all" style={{ width: `${progress}%` }} />
+                  </div>
+                </div>
+
+                {debtPayments.length > 0 && (
+                  <details className="mb-4 rounded-xl bg-gray-50 p-3">
+                    <summary className="cursor-pointer text-sm font-semibold">Ver histórico ({debtPayments.length})</summary>
+                    <div className="mt-3 space-y-2">
+                      {debtPayments.map((payment) => (
+                        <div key={payment.id} className="flex justify-between gap-4 text-sm">
+                          <span>{new Date(payment.paid_at).toLocaleDateString('pt-BR')}{payment.notes ? ` · ${payment.notes}` : ''}</span>
+                          <b className="text-emerald-700">-{formatCurrency(payment.amount)}</b>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                )}
+
                 <div className="flex gap-2">
                   <button
-                    onClick={() => handleMarkPaid(debt.id)}
+                    onClick={() => {
+                      setPaymentDebt(debt)
+                      setPaymentAmount(String(debt.monthly_payment || ''))
+                    }}
                     className="flex-1 btn btn-primary text-sm"
                   >
-                    ✓ Quitada
+                    + Registrar pagamento
                   </button>
                   <button
                     onClick={() => handleDeleteDebt(debt.id)}
@@ -332,6 +429,28 @@ export default function Debts() {
           })
         )}
       </div>
+
+      {paymentDebt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4" role="dialog" aria-modal="true" aria-labelledby="payment-title">
+          <form onSubmit={handlePayment} className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-blue-700">ABATER DÍVIDA</p>
+                <h2 id="payment-title" className="text-2xl font-bold">{paymentDebt.creditor}</h2>
+                <p className="mt-1 text-sm text-gray-600">Saldo atual: {formatCurrency(paymentDebt.total_amount)}</p>
+              </div>
+              <button type="button" onClick={() => setPaymentDebt(null)} aria-label="Fechar" className="rounded-lg bg-gray-100 px-3 py-2">✕</button>
+            </div>
+            <label className="label mt-6">Valor pago</label>
+            <input autoFocus required className="input" type="number" min="0.01" max={paymentDebt.total_amount} step="0.01" value={paymentAmount} onChange={(event) => setPaymentAmount(event.target.value)} />
+            <label className="label mt-4">Observação (opcional)</label>
+            <input className="input" placeholder="Ex.: parcela de agosto" value={paymentNotes} onChange={(event) => setPaymentNotes(event.target.value)} />
+            <button disabled={savingPayment} className="btn btn-primary mt-6 w-full disabled:opacity-50">
+              {savingPayment ? 'Registrando…' : 'Confirmar pagamento'}
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   )
 }
