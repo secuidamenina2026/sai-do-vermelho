@@ -156,7 +156,7 @@ CREATE POLICY "Users can view own goals" ON goals
 CREATE POLICY "Users can create goals" ON goals
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can update own goals" ON goals
-  FOR UPDATE USING (auth.uid() = user_id);
+  FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "Users can delete own goals" ON goals
   FOR DELETE USING (auth.uid() = user_id);
 

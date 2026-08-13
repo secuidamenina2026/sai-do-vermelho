@@ -255,6 +255,15 @@ export default function Dashboard() {
         </div>
         <span className="whitespace-nowrap font-bold text-purple-700">Analisar meu mês →</span>
       </Link>
+
+      <Link href="/dashboard/reserva" className="card flex flex-col gap-4 border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 transition-shadow hover:shadow-md md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-wide text-emerald-800">🛡️ Reserva inteligente</p>
+          <h2 className="mt-1 text-xl font-bold">Descubra quanto precisa para ficar protegido</h2>
+          <p className="mt-1 text-sm text-gray-600">Metas de três e seis meses calculadas com base no seu custo essencial real.</p>
+        </div>
+        <span className="whitespace-nowrap font-bold text-emerald-800">Construir proteção →</span>
+      </Link>
     </div>
   )
 }

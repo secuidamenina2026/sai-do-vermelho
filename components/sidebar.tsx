@@ -15,6 +15,7 @@ export function Sidebar() {
     { href: '/dashboard/dividas', label: '📉 Dívidas', icon: '📉' },
     { href: '/dashboard/plano', label: '🚀 Meu Plano', icon: '🚀' },
     { href: '/dashboard/metas', label: '🎯 Metas', icon: '🎯' },
+    { href: '/dashboard/reserva', label: '🛡️ Minha Reserva', icon: '🛡️' },
     { href: '/dashboard/ia', label: '🤖 Consultoria IA', icon: '🤖' },
     { href: '/dashboard/resumo', label: '✨ Diagnóstico Mensal', icon: '✨' },
   ]
