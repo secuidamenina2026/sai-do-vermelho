@@ -12,6 +12,7 @@ export function Sidebar() {
     { href: '/dashboard/diagnostico', label: '🩺 Diagnóstico Grátis', icon: '🩺' },
     { href: '/dashboard/orcamento', label: '💰 Orçamento', icon: '💰' },
     { href: '/dashboard/entradas', label: '💵 Entradas', icon: '💵' },
+    { href: '/dashboard/calendario', label: '🗓️ Calendário', icon: '🗓️' },
     { href: '/dashboard/gastos', label: '💳 Gastos', icon: '💳' },
     { href: '/dashboard/dividas', label: '📉 Dívidas', icon: '📉' },
     { href: '/dashboard/plano', label: '🚀 Meu Plano', icon: '🚀' },

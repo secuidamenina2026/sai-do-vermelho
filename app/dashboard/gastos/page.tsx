@@ -15,17 +15,30 @@ type Expense = {
   actual_amount: number
   notes: string | null
   created_at: string
+  description: string | null
+  due_date: string | null
+  paid_date: string | null
+  status: 'planned' | 'paid' | 'canceled'
+  is_recurring: boolean
 }
+
+type CustomCategory = { id: string; name: string; slug: string; icon: string; bucket: string }
 
 export default function Expenses() {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [budget, setBudget] = useState<any>(null)
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [customCategories, setCustomCategories] = useState<CustomCategory[]>([])
+  const [newCategory, setNewCategory] = useState('')
   const [formData, setFormData] = useState({
     category: 'mercado',
     actual_amount: '',
     notes: '',
+    description: '',
+    due_date: new Date().toISOString().slice(0, 10),
+    status: 'paid' as 'planned' | 'paid',
+    is_recurring: false,
   })
 
   useEffect(() => {
@@ -38,16 +51,17 @@ export default function Expenses() {
       if (user) {
         const currentMonth = new Date().toISOString().split('T')[0].slice(0, 7) + '-01'
 
-        const { data: expensesData } = await supabase
+        const [{ data: expensesData }, { data: categoryData }] = await Promise.all([supabase
           .from('expenses')
           .select('*')
           .eq('user_id', user.id)
           .gte('month', currentMonth)
-          .order('created_at', { ascending: false })
+          .order('due_date', { ascending: false }), supabase.from('user_categories').select('*').eq('user_id', user.id).eq('archived', false).neq('bucket', 'income').order('name')])
 
         if (expensesData) {
           setExpenses(expensesData)
         }
+        setCustomCategories(categoryData || [])
 
         const { data: budgetData } = await supabase
           .from('monthly_budgets')
@@ -82,6 +96,12 @@ export default function Expenses() {
             actual_amount: parseFloat(formData.actual_amount),
             month: currentMonth,
             notes: formData.notes,
+            description: formData.description.trim() || formData.notes.trim() || 'Gasto registrado',
+            due_date: formData.due_date,
+            paid_date: formData.status === 'paid' ? new Date().toISOString().slice(0, 10) : null,
+            status: formData.status,
+            is_recurring: formData.is_recurring,
+            recurrence: formData.is_recurring ? 'monthly' : null,
           })
           .select()
 
@@ -91,6 +111,10 @@ export default function Expenses() {
             category: 'mercado',
             actual_amount: '',
             notes: '',
+            description: '',
+            due_date: new Date().toISOString().slice(0, 10),
+            status: 'paid',
+            is_recurring: false,
           })
           setShowForm(false)
         }
@@ -98,6 +122,16 @@ export default function Expenses() {
     } catch (error) {
       console.error('Error adding expense:', error)
     }
+  }
+
+  const addCustomCategory = async () => {
+    const name = newCategory.trim()
+    if (!name) return
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const slug = `custom-${name.toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`
+    const { data, error } = await supabase.from('user_categories').insert({ user_id: user.id, name, slug, icon: '🏷️', bucket: 'essential' }).select().single()
+    if (!error && data) { setCustomCategories((items) => [...items, data]); setFormData((current) => ({ ...current, category: data.slug })); setNewCategory('') }
   }
 
   const handleDeleteExpense = async (id: string) => {
@@ -163,6 +197,10 @@ export default function Expenses() {
           {showForm ? (
             <form onSubmit={handleAddExpense} className="space-y-4">
               <div>
+                <label className="label">Descrição</label>
+                <input value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="input" placeholder="Ex.: Conta de energia" required />
+              </div>
+              <div>
                 <label className="label">Categoria</label>
                 <select
                   value={formData.category}
@@ -178,9 +216,20 @@ export default function Expenses() {
                       ))}
                     </optgroup>
                   ))}
+                  {customCategories.length > 0 && <optgroup label="Minhas categorias">{customCategories.map((category) => <option key={category.id} value={category.slug}>{category.icon} {category.name}</option>)}</optgroup>}
                 </select>
+                <div className="mt-2 flex gap-2"><input className="input" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="Criar categoria própria" /><button type="button" onClick={addCustomCategory} className="btn btn-secondary">Criar</button></div>
               </div>
 
+              <div>
+                <label className="label">Vencimento</label>
+                <input type="date" value={formData.due_date} onChange={(e) => setFormData({ ...formData, due_date: e.target.value })} className="input" required />
+              </div>
+              <div>
+                <label className="label">Situação</label>
+                <select className="input" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as 'planned' | 'paid' })}><option value="planned">Previsto</option><option value="paid">Já foi pago</option></select>
+              </div>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={formData.is_recurring} onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })} /> Repetir todo mês</label>
               <div>
                 <label className="label">Valor (R$)</label>
                 <input
@@ -254,10 +303,10 @@ export default function Expenses() {
               {expenses.map((expense) => (
                 <tr key={expense.id} className="border-b hover:bg-gray-50">
                   <td className="py-3">
-                    {new Date(expense.created_at).toLocaleDateString('pt-BR')}
+                    {new Date((expense.due_date || expense.created_at) + (expense.due_date ? 'T12:00:00' : '')).toLocaleDateString('pt-BR')}
                   </td>
                   <td className="py-3">{getExpenseCategoryLabel(expense.category)}</td>
-                  <td className="py-3 text-sm text-gray-600">{expense.notes}</td>
+                  <td className="py-3 text-sm text-gray-600"><b className="block text-gray-900">{expense.description || expense.notes}</b>{expense.status === 'planned' ? <span className="text-amber-700">Previsto</span> : <span className="text-emerald-700">Pago</span>}</td>
                   <td className="py-3 text-right font-bold">
                     {formatCurrency(expense.actual_amount || 0)}
                   </td>
