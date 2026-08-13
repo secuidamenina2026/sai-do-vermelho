@@ -54,7 +54,7 @@ export default function Register() {
           savings_budget: 0,
         })
 
-        router.push('/dashboard/diagnostico')
+        router.push('/onboarding')
       }
     } catch (err: any) {
       setError(err.message || 'Erro ao criar conta')

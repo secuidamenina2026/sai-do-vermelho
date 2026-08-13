@@ -50,6 +50,10 @@ export type Database = {
           monthly_income: number | null
           created_at: string
           updated_at: string
+          onboarding_completed: boolean
+          onboarding_step: number
+          financial_goal: string | null
+          income_type: 'fixed' | 'variable' | null
         }
       }
       monthly_budgets: {
@@ -73,6 +77,23 @@ export type Database = {
           planned_amount: number | null
           actual_amount: number | null
           month: string
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+      }
+      income_entries: {
+        Row: {
+          id: string
+          user_id: string
+          description: string
+          amount: number
+          category: string
+          expected_date: string
+          received_date: string | null
+          status: 'expected' | 'received' | 'canceled'
+          is_recurring: boolean
+          recurrence: 'weekly' | 'monthly' | 'yearly' | null
           notes: string | null
           created_at: string
           updated_at: string

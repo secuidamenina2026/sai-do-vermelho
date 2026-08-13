@@ -18,6 +18,12 @@ export default function DashboardLayout({
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         router.push('/auth/login')
+      } else {
+        const { data: profile } = await supabase.from('users').select('onboarding_completed').eq('id', user.id).single()
+        if (profile && !profile.onboarding_completed) {
+          router.push('/onboarding')
+          return
+        }
       }
       setLoading(false)
     }
