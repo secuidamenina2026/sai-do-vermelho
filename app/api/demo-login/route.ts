@@ -20,6 +20,8 @@ export const dynamic = 'force-dynamic'
 const DEMO_EMAIL = 'teste@saidovermelho.app'
 const DEMO_NAME = 'Conta de Teste'
 
+const DEMO_PASSWORD = 'SaiDoVermelho@Teste2026!'
+
 const derive = (salt: string) =>
   createHash('sha256')
     .update(`${process.env.SUPABASE_SERVICE_KEY || ''}:${salt}`)
@@ -37,7 +39,9 @@ export async function GET(request: NextRequest) {
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
 
-  const password = derive('demo-password').slice(0, 32)
+  // Credencial deliberadamente compartilhável: esta conta contém somente
+  // dados fictícios e continua isolada dos usuários reais pelas políticas RLS.
+  const password = DEMO_PASSWORD
 
   const { data: created, error: createError } = await admin.auth.admin.createUser({
     email: DEMO_EMAIL,
