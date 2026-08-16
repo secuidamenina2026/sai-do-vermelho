@@ -2,122 +2,60 @@
 
 import { useState } from 'react'
 
-const KIWIFY_PRO = 'https://pay.kiwify.com.br/1XzR7vC'
-
-const CATEGORIAS = [
-  { value: 'geral', label: '💬 Pergunta geral' },
-  { value: 'essenciais', label: '🏠 Contas essenciais' },
-  { value: 'desejos', label: '🛍️ Gastos com desejos' },
-  { value: 'dividas', label: '📉 Dívidas' },
-  { value: 'poupanca', label: '🐷 Poupança e metas' },
+const CATEGORIES = [
+  { value: 'geral', label: 'Visão geral' }, { value: 'essenciais', label: 'Contas essenciais' },
+  { value: 'desejos', label: 'Gastos com desejos' }, { value: 'dividas', label: 'Dívidas' },
+  { value: 'poupanca', label: 'Reserva e metas' },
 ]
 
-export default function ConsultoriaIA() {
+const SUGGESTIONS = [
+  'Qual é o próximo passo mais importante para mim?',
+  'Onde consigo economizar sem piorar minha qualidade de vida?',
+  'Como posso acelerar a quitação das minhas dívidas?',
+]
+
+export default function OrientacaoIA() {
   const [category, setCategory] = useState('geral')
   const [question, setQuestion] = useState('')
   const [response, setResponse] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [needUpgrade, setNeedUpgrade] = useState(false)
+  const [usage, setUsage] = useState<{ used: number; limit: number; remaining: number } | null>(null)
 
-  const handleAsk = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleAsk = async (event: React.FormEvent) => {
+    event.preventDefault()
     if (!question.trim()) return
-    setLoading(true)
-    setError('')
-    setResponse('')
-    setNeedUpgrade(false)
-
+    setLoading(true); setError(''); setResponse('')
     try {
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category, question }),
-      })
-      const data = await res.json()
-
-      if (res.status === 403 && data.code === 'PLAN_UPGRADE_REQUIRED') {
-        setNeedUpgrade(true)
-      } else if (!res.ok) {
-        setError(data.error || 'Erro ao consultar a IA. Tente novamente.')
-      } else {
-        setResponse(data.response)
-      }
-    } catch {
-      setError('Erro de conexão. Tente novamente.')
-    } finally {
-      setLoading(false)
-    }
+      const result = await fetch('/api/ai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ category, question }) })
+      const data = await result.json()
+      if (!result.ok) setError(data.error || 'Não foi possível analisar agora. Tente novamente.')
+      else { setResponse(data.response); setUsage(data.usage) }
+    } catch { setError('Erro de conexão. Tente novamente.') }
+    finally { setLoading(false) }
   }
 
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-3xl font-bold mb-2">🤖 Consultoria IA</h1>
-      <p className="text-gray-600 mb-8">
-        Pergunte qualquer coisa sobre suas finanças. A IA responde com base nos SEUS números.
-      </p>
+    <div className="mx-auto max-w-5xl space-y-6 pb-12">
+      <section className="relative overflow-hidden rounded-[2rem] bg-slate-950 p-6 text-white shadow-xl md:p-9">
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-violet-500/20 blur-3xl" />
+        <div className="relative max-w-3xl"><p className="text-sm font-black uppercase tracking-[.18em] text-violet-300">Orientação inteligente</p><h1 className="mt-3 text-3xl font-black tracking-tight md:text-5xl">Seus números. Uma resposta clara.</h1><p className="mt-4 max-w-2xl leading-7 text-slate-300">Pergunte sobre sua realidade financeira. A orientação considera os dados registrados no sistema e indica caminhos possíveis, sem julgamentos.</p></div>
+        <div className="relative mt-7 flex items-center justify-between rounded-2xl border border-white/10 bg-white/[.05] px-4 py-3 text-sm"><span>Limite de uso responsável</span><b className="text-violet-300">{usage ? `${usage.remaining} de ${usage.limit} restantes` : '30 orientações por mês'}</b></div>
+      </section>
 
-      <form onSubmit={handleAsk} className="card mb-6 space-y-4">
-        <div>
-          <label className="label">Sobre o que é sua dúvida?</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="input"
-          >
-            {CATEGORIAS.map((c) => (
-              <option key={c.value} value={c.value}>{c.label}</option>
-            ))}
-          </select>
-        </div>
+      <div className="grid gap-6 lg:grid-cols-[.7fr_1.3fr]">
+        <aside className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"><p className="text-xs font-black uppercase tracking-[.16em] text-slate-400">Você pode perguntar</p><div className="mt-4 space-y-2">{SUGGESTIONS.map(suggestion => <button key={suggestion} onClick={() => setQuestion(suggestion)} className="w-full rounded-2xl bg-slate-50 p-4 text-left text-sm font-bold leading-6 text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-800">{suggestion} <span>→</span></button>)}</div><p className="mt-5 text-xs leading-5 text-slate-400">As respostas são educativas e não substituem aconselhamento financeiro profissional.</p></aside>
 
-        <div>
-          <label className="label">Sua pergunta</label>
-          <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            className="input min-h-[120px]"
-            placeholder="Ex: Como faço para quitar minha dívida do cartão em 6 meses com a minha renda atual?"
-            required
-          />
-        </div>
+        <form onSubmit={handleAsk} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-7">
+          <label className="label">Assunto principal</label><select value={category} onChange={(event) => setCategory(event.target.value)} className="input">{CATEGORIES.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</select>
+          <label className="label mt-5">O que você quer decidir?</label><textarea value={question} onChange={(event) => setQuestion(event.target.value)} className="input min-h-[160px] resize-none text-base leading-7" placeholder="Ex.: Com a minha renda atual, qual dívida devo priorizar primeiro?" required minLength={5} maxLength={600} />
+          <div className="mt-2 text-right text-xs text-slate-400">{question.length}/600</div>
+          <button disabled={loading} className="mt-4 w-full rounded-xl bg-slate-950 px-5 py-3.5 font-black text-white transition hover:bg-slate-800 disabled:opacity-50">{loading ? 'Analisando seus números…' : 'Receber minha orientação →'}</button>
+        </form>
+      </div>
 
-        <button type="submit" disabled={loading} className="btn btn-primary w-full">
-          {loading ? 'Analisando suas finanças...' : 'Perguntar à IA 🚀'}
-        </button>
-      </form>
-
-      {needUpgrade && (
-        <div className="card border-2 border-blue-600 bg-blue-50">
-          <h3 className="text-xl font-bold mb-2">🔒 A Consultoria IA é exclusiva dos planos pagos</h3>
-          <p className="text-gray-700 mb-4">
-            Desbloqueie um consultor financeiro pessoal 24h por dia, que conhece seus números
-            e te diz exatamente o que fazer — por menos de R$1,60 por dia.
-          </p>
-          <a href={KIWIFY_PRO} className="btn btn-primary text-center block w-full text-lg py-4">
-            ⭐ Assinar o Plano Completo — R$47/mês
-          </a>
-          <p className="text-sm text-gray-500 mt-3 text-center">
-            Garantia de 7 dias. Cancele quando quiser.
-          </p>
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      )}
-
-      {response && (
-        <div className="card bg-gradient-to-br from-blue-50 to-indigo-50">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">🤖</span>
-            <h3 className="font-bold">Sua consultoria personalizada</h3>
-          </div>
-          <div className="whitespace-pre-wrap text-gray-800">{response}</div>
-        </div>
-      )}
+      {error && <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-rose-700" role="alert">{error}</div>}
+      {response && <section className="rounded-3xl border border-violet-200 bg-gradient-to-br from-white to-violet-50 p-6 shadow-sm md:p-8"><p className="text-xs font-black uppercase tracking-[.16em] text-violet-700">Sua orientação personalizada</p><div className="mt-5 whitespace-pre-wrap leading-8 text-slate-700">{response}</div></section>}
     </div>
   )
 }

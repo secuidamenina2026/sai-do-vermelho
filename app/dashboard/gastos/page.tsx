@@ -31,6 +31,7 @@ export default function Expenses() {
   const [loading, setLoading] = useState(true)
   const [customCategories, setCustomCategories] = useState<CustomCategory[]>([])
   const [newCategory, setNewCategory] = useState('')
+  const [categorySearch, setCategorySearch] = useState('')
   const [formData, setFormData] = useState({
     category: 'mercado',
     actual_amount: '',
@@ -135,6 +136,7 @@ export default function Expenses() {
   }
 
   const handleDeleteExpense = async (id: string) => {
+    if (!window.confirm('Remover este gasto do histórico?')) return
     try {
       await supabase.from('expenses').delete().eq('id', id)
       setExpenses(expenses.filter((e) => e.id !== id))
@@ -155,30 +157,34 @@ export default function Expenses() {
       .filter((e) => e.category === cat)
       .reduce((sum, e) => sum + (e.actual_amount || 0), 0),
   }))
+  const visibleCategories = EXPENSE_CATEGORIES.filter((category) =>
+    `${category.label} ${category.group}`.toLocaleLowerCase('pt-BR').includes(categorySearch.toLocaleLowerCase('pt-BR')),
+  )
+  const quickCategories = EXPENSE_CATEGORIES.filter((category) => ['mercado', 'energia', 'combustivel', 'restaurante', 'medicamentos', 'pagamento_divida'].includes(category.value))
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">💳 Rastreio de Gastos</h1>
-        <p className="text-gray-600">Acompanhe cada centavo gasto neste mês</p>
+    <div className="mx-auto max-w-7xl space-y-6 pb-12">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div><p className="text-sm font-black uppercase tracking-[.18em] text-emerald-600">Consciência sem culpa</p><h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">Para onde foi seu dinheiro?</h1><p className="mt-2 text-slate-500">Registre, entenda e decida melhor no próximo gasto.</p></div>
+        <button onClick={() => setShowForm(true)} className="rounded-xl bg-slate-950 px-5 py-3 font-black text-white shadow-lg transition hover:-translate-y-0.5">+ Registrar gasto</button>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-4">
-        <div className="card">
-          <p className="text-gray-600 text-sm">Total Gasto</p>
-          <p className="text-3xl font-bold text-red-600">{formatCurrency(totalExpenses)}</p>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-2xl bg-slate-950 p-5 text-white shadow-lg">
+          <p className="text-sm font-semibold text-slate-400">Total registrado</p>
+          <p className="mt-2 text-3xl font-black">{formatCurrency(totalExpenses)}</p>
         </div>
         {budget && (
           <>
-            <div className="card">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <p className="text-gray-600 text-sm">Limite Essenciais</p>
               <p className="text-3xl font-bold">R$ {budget.essentials_budget?.toFixed(2)}</p>
             </div>
-            <div className="card">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <p className="text-gray-600 text-sm">Limite Desejos</p>
               <p className="text-3xl font-bold">R$ {budget.desires_budget?.toFixed(2)}</p>
             </div>
-            <div className="card">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <p className="text-gray-600 text-sm">Poupança (Meta)</p>
               <p className="text-3xl font-bold">R$ {budget.savings_budget?.toFixed(2)}</p>
             </div>
@@ -186,9 +192,9 @@ export default function Expenses() {
         )}
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid gap-6 lg:grid-cols-[1.08fr_.92fr]">
         {/* Add Expense Form */}
-        <div className="card">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-7">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-bold">Adicionar Gasto</h2>
             {showForm && <button className="text-sm text-gray-500" onClick={() => setShowForm(false)}>✕</button>}
@@ -202,14 +208,16 @@ export default function Expenses() {
               </div>
               <div>
                 <label className="label">Categoria</label>
+                <input value={categorySearch} onChange={(e) => setCategorySearch(e.target.value)} className="input mb-2" placeholder="Buscar entre mais de 50 categorias…" />
+                {!categorySearch && <div className="mb-3 flex flex-wrap gap-2">{quickCategories.map(category => <button key={category.value} type="button" onClick={() => setFormData({ ...formData, category: category.value })} className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${formData.category === category.value ? 'border-emerald-500 bg-emerald-50 text-emerald-800' : 'border-slate-200 text-slate-500 hover:border-slate-300'}`}>{category.label}</button>)}</div>}
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="input"
                 >
-                  {CATEGORY_GROUPS.map((group) => (
+                  {CATEGORY_GROUPS.filter(group => visibleCategories.some(category => category.group === group)).map((group) => (
                     <optgroup key={group} label={group}>
-                      {EXPENSE_CATEGORIES.filter((category) => category.group === group).map((category) => (
+                      {visibleCategories.filter((category) => category.group === group).map((category) => (
                         <option key={category.value} value={category.value}>
                           {category.label}
                         </option>
@@ -266,7 +274,7 @@ export default function Expenses() {
         </div>
 
         {/* Category Summary */}
-        <div className="card">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-7">
           <h2 className="text-xl font-bold mb-4">Gastos por Categoria</h2>
           <div className="space-y-3">
             {categoryTotals
@@ -286,7 +294,7 @@ export default function Expenses() {
       </div>
 
       {/* Expenses List */}
-      <div className="card">
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-7">
         <h2 className="text-xl font-bold mb-4">Histórico de Gastos</h2>
         <div className="overflow-x-auto">
           <table className="w-full">

@@ -2,18 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import Stripe from 'stripe'
 
-// Initialize Stripe for webhook verification
-const stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-08-16',
-})
+const getStripe = () => {
+  const secretKey = process.env.STRIPE_SECRET_KEY
+  if (!secretKey) throw new Error('Stripe não configurado')
+  return new Stripe(secretKey, { apiVersion: '2023-08-16' })
+}
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
-
-// Initialize Supabase with service key for server-side operations
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-)
+const getSupabaseAdmin = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_KEY
+  if (!url || !serviceKey) throw new Error('Supabase não configurado para o webhook')
+  return createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +25,8 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(request: NextRequest) {
   try {
+    const stripeClient = getStripe()
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
     const body = await request.text()
     const signature = request.headers.get('stripe-signature')
 
@@ -91,6 +95,7 @@ export async function POST(request: NextRequest) {
  */
 async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
   try {
+    const supabase = getSupabaseAdmin()
     const userId = subscription.metadata?.userId
     const plan = subscription.metadata?.plan
 
@@ -137,6 +142,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
  */
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   try {
+    const supabase = getSupabaseAdmin()
     const userId = subscription.metadata?.userId
     const plan = subscription.metadata?.plan
 
@@ -185,6 +191,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
  */
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   try {
+    const supabase = getSupabaseAdmin()
     const userId = subscription.metadata?.userId
 
     if (!userId) {
@@ -223,6 +230,8 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
  */
 async function handleChargeFailed(charge: Stripe.Charge) {
   try {
+    const stripeClient = getStripe()
+    const supabase = getSupabaseAdmin()
     const subscriptionId = charge.invoice ?
       (typeof charge.invoice === 'string' ? charge.invoice : charge.invoice.subscription)
       : null

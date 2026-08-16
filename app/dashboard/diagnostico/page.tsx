@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { formatCurrency, parseMoney, simulatePayoffPlan } from '@/lib/financial'
 
-const KIWIFY_PRO = 'https://pay.kiwify.com.br/1XzR7vC'
-
 const TIPOS_DIVIDA = [
   '💳 Cartão de crédito',
   '🏦 Cheque especial',
@@ -95,7 +93,8 @@ export default function Diagnostico() {
 
   return (
     <div className="max-w-xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold mb-1">🩺 Diagnóstico Financeiro Grátis</h1>
+      <p className="text-sm font-black uppercase tracking-[.16em] text-emerald-700">Raio-X financeiro</p>
+      <h1 className="mt-2 text-3xl font-black tracking-tight">Enxergue sua situação sem medo</h1>
       <p className="text-gray-600 mb-6 text-sm md:text-base">
         Responda em 1 minuto e receba seu raio-X das dívidas.
       </p>
@@ -103,7 +102,7 @@ export default function Diagnostico() {
       {/* Barra de progresso */}
       <div className="flex gap-2 mb-8">
         {[1, 2, 3].map((n) => (
-          <div key={n} className={`h-2 flex-1 rounded-full ${etapa >= n ? 'bg-blue-600' : 'bg-gray-200'}`} />
+          <div key={n} className={`h-2 flex-1 rounded-full ${etapa >= n ? 'bg-emerald-500' : 'bg-gray-200'}`} />
         ))}
       </div>
 
@@ -292,14 +291,14 @@ export default function Diagnostico() {
             </div>
           )}
 
-          {/* BLOCO DE CONVERSÃO */}
+          {/* Próximos recursos disponíveis no acesso */}
           <div className="card border-2 border-blue-600 bg-gradient-to-br from-blue-50 to-indigo-50">
-            <h3 className="text-xl font-extrabold mb-2">Quer usar TODOS os nossos recursos agora mesmo? 🚀</h3>
+            <h3 className="text-xl font-extrabold mb-2">Seu próximo passo já está liberado 🚀</h3>
             <p className="text-sm text-gray-700 mb-3">
-              Esse diagnóstico é só o começo. No plano completo, você destrava:
+              Agora transforme este diagnóstico em ação usando os recursos incluídos no seu acesso:
             </p>
             <ul className="space-y-2 text-sm mb-4">
-              <li className="flex gap-2"><span>🤖</span><span><b>Consultoria de IA ilimitada:</b> pergunte "como quito o cartão em 4 meses?" e receba um plano feito para os SEUS números — como um consultor de R$300/hora, por menos de R$1,60 por dia</span></li>
+              <li className="flex gap-2"><span>🤖</span><span><b>30 orientações de IA por mês:</b> pergunte como organizar suas dívidas e receba uma resposta baseada nos seus números</span></li>
               <li className="flex gap-2"><span>📉</span><span><b>Plano de quitação acompanhado mês a mês</b> — o app recalcula sua bola de neve a cada pagamento</span></li>
               <li className="flex gap-2"><span>📊</span><span><b>Orçamento 50-30-20 automático</b> com alertas quando algo sai do trilho</span></li>
               <li className="flex gap-2"><span>🎯</span><span><b>Metas inteligentes</b> — a IA sugere quanto guardar e onde cortar</span></li>
@@ -308,15 +307,7 @@ export default function Diagnostico() {
               Você acabou de ver o tamanho do problema. Agora imagine ter um especialista do seu lado
               todos os dias até a última dívida sumir.
             </p>
-            <a
-              href={KIWIFY_PRO}
-              className="btn btn-primary w-full text-center text-lg py-4 mb-2 block"
-            >
-              ⭐ ASSINAR O PLANO COMPLETO — R$47/mês
-            </a>
-            <p className="text-xs text-gray-500 text-center mt-2">
-              Garantia de 7 dias · Cancele quando quiser · Pagamento seguro
-            </p>
+            <div className="rounded-xl bg-blue-600 px-4 py-3 text-center font-bold text-white">✓ Recursos incluídos no seu acesso de 12 meses</div>
           </div>
 
           <button

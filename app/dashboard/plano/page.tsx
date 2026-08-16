@@ -94,12 +94,12 @@ export default function FinancialFreedomPlan() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-7xl space-y-6 pb-12">
       <section className="overflow-hidden rounded-3xl bg-slate-950 p-6 text-white shadow-xl md:p-8">
         <div className="grid gap-8 lg:grid-cols-[1.3fr_.7fr] lg:items-center">
           <div>
-            <span className="inline-flex rounded-full bg-emerald-400/15 px-3 py-1 text-sm font-semibold text-emerald-300">Plano de Liberdade Financeira</span>
-            <h1 className="mt-4 text-3xl font-bold md:text-5xl">
+            <span className="inline-flex rounded-full bg-emerald-400/15 px-3 py-1 text-sm font-black text-emerald-300">PLANO DE LIBERDADE FINANCEIRA</span>
+            <h1 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">
               {acceleratedPlan.months !== null
                 ? <>Você pode sair do vermelho em <span className="text-emerald-300">{formatPayoffDate(acceleratedPlan.months)}</span></>
                 : 'Vamos ajustar seu plano para ele funcionar'}
@@ -119,8 +119,8 @@ export default function FinancialFreedomPlan() {
       <section className="card">
         <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-blue-700">Sua jornada</p>
-            <h2 className="text-2xl font-bold">Do vermelho ao investidor</h2>
+            <p className="text-sm font-black uppercase tracking-[.16em] text-emerald-700">Sua jornada</p>
+            <h2 className="text-2xl font-black tracking-tight">Do vermelho ao investidor</h2>
           </div>
           <p className="text-sm text-gray-500">Você está na etapa 1 de 4</p>
         </div>
@@ -141,7 +141,7 @@ export default function FinancialFreedomPlan() {
           <p className="mt-1 text-sm text-gray-600">Teste sem compromisso e veja o impacto no seu futuro.</p>
           <div className="mt-5 flex flex-wrap gap-2">
             {[100, 300, 500, 1000].map((value) => (
-              <button key={value} onClick={() => setExtraPayment(value)} className={`rounded-xl px-4 py-2 font-semibold ${extraPayment === value ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}>
+              <button key={value} onClick={() => setExtraPayment(value)} className={`rounded-xl px-4 py-2 font-black ${extraPayment === value ? 'bg-slate-950 text-white' : 'bg-gray-100 text-gray-700'}`}>
                 + {formatCurrency(value)}
               </button>
             ))}
@@ -168,7 +168,7 @@ export default function FinancialFreedomPlan() {
               ['snowball', '❄️ Bola de neve', snowball, 'Vitórias mais rápidas'],
               ['avalanche', '🏔️ Avalanche', avalanche, 'Menor custo de juros'],
             ] as const).map(([key, label, plan, description]) => (
-              <button key={key} onClick={() => setStrategy(key)} className={`w-full rounded-2xl p-4 text-left ring-2 transition ${strategy === key ? 'bg-blue-50 ring-blue-600' : 'ring-gray-200 hover:ring-blue-300'}`}>
+              <button key={key} onClick={() => setStrategy(key)} className={`w-full rounded-2xl p-4 text-left ring-2 transition ${strategy === key ? 'bg-emerald-50 ring-emerald-500' : 'ring-gray-200 hover:ring-emerald-300'}`}>
                 <div className="flex items-center justify-between gap-3">
                   <div><p className="font-bold">{label}</p><p className="text-sm text-gray-600">{description}</p></div>
                   {recommendedStrategy === key && <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Recomendado</span>}
@@ -183,7 +183,7 @@ export default function FinancialFreedomPlan() {
       <section className="card">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-sm font-semibold text-blue-700">PRÓXIMA AÇÃO</p>
+            <p className="text-sm font-black tracking-[.16em] text-emerald-700">PRÓXIMA AÇÃO</p>
             <h2 className="mt-1 text-xl font-bold">Concentre o valor extra em uma dívida por vez</h2>
             <p className="mt-1 text-gray-600">Mantenha as parcelas mínimas das demais e priorize: <b>{[...debtInputs].sort((a, b) => strategy === 'avalanche' ? b.monthlyInterestRate - a.monthlyInterestRate : a.balance - b.balance)[0]?.name}</b>.</p>
           </div>

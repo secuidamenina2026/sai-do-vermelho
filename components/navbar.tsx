@@ -24,11 +24,11 @@ export function Navbar() {
   }
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="container flex items-center justify-between h-16">
+    <nav className="sticky top-0 z-50 border-b border-slate-200/80 bg-[#f7f8f4]/90 backdrop-blur-xl">
+      <div className="container flex items-center justify-between py-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl">💰</span>
-          <span className="font-bold text-lg">Sai do Vermelho</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-950 text-lg font-black text-emerald-400">S</span>
+          <span className="text-lg font-black tracking-tight">Sai do <span className="text-emerald-600">Vermelho</span></span>
         </Link>
 
         <div className="flex items-center gap-4">
@@ -38,13 +38,13 @@ export function Navbar() {
                 <>
                   <Link
                     href="/dashboard"
-                    className="text-gray-700 hover:text-gray-900"
+                    className="text-sm font-bold text-slate-600 hover:text-slate-950"
                   >
                     Dashboard
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="btn btn-secondary text-sm"
+                    className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold hover:bg-slate-50"
                   >
                     Sair
                   </button>
@@ -53,15 +53,15 @@ export function Navbar() {
                 <>
                   <Link
                     href="/auth/login"
-                    className="text-gray-700 hover:text-gray-900"
+                    className="hidden text-sm font-bold text-slate-600 hover:text-slate-950 sm:block"
                   >
                     Entrar
                   </Link>
                   <Link
-                    href="/auth/register"
-                    className="btn btn-primary text-sm"
+                    href="/#pricing"
+                    className="rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800"
                   >
-                    Comece Grátis
+                    Começar por R$ 97
                   </Link>
                 </>
               )}

@@ -3,8 +3,8 @@ import { Navbar } from '@/components/navbar'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
-  title: 'Sai do Vermelho - Sua Jornada Financeira',
-  description: 'Seu GPS para sair das dívidas, organizar os gastos e construir sua primeira reserva.',
+  title: 'Sai do Vermelho | Sua rota para uma vida financeira mais leve',
+  description: 'Organize seus gastos, escolha a melhor estratégia para quitar dívidas e construa sua primeira reserva com uma rota clara.',
 }
 
 export default function RootLayout({

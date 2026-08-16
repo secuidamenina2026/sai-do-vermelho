@@ -144,20 +144,8 @@ export default function Debts() {
     }
   }
 
-  const handleMarkPaid = async (id: string) => {
-    try {
-      await supabase
-        .from('debts')
-        .update({ is_paid: true })
-        .eq('id', id)
-
-      setDebts(debts.filter((d) => d.id !== id))
-    } catch (error) {
-      console.error('Error marking debt as paid:', error)
-    }
-  }
-
   const handleDeleteDebt = async (id: string) => {
+    if (!window.confirm('Remover esta dívida e seu histórico da tela?')) return
     try {
       await supabase.from('debts').delete().eq('id', id)
       setDebts(debts.filter((d) => d.id !== id))
@@ -190,13 +178,10 @@ export default function Debts() {
   )
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">💳 Gestor de Dívidas</h1>
-        <p className="text-gray-600">
-          Pague o mínimo de todas e direcione todo valor extra para uma dívida por vez.
-          Escolha entre vitórias rápidas ou menor custo de juros.
-        </p>
+    <div className="mx-auto max-w-7xl space-y-6 pb-12">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div><p className="text-sm font-black uppercase tracking-[.18em] text-emerald-600">Sua rota de quitação</p><h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 md:text-4xl">Cada pagamento é uma vitória.</h1><p className="mt-2 max-w-2xl text-slate-500">Mantenha o mínimo das demais e concentre todo valor extra em uma dívida por vez.</p></div>
+        <button onClick={() => setShowForm(true)} className="rounded-xl bg-slate-950 px-5 py-3 font-black text-white shadow-lg transition hover:-translate-y-0.5">+ Adicionar dívida</button>
       </div>
 
       {celebration && (
@@ -208,23 +193,23 @@ export default function Debts() {
         </div>
       )}
 
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="card">
-          <p className="text-gray-600 text-sm">Dívida Total</p>
-          <p className="text-3xl font-bold text-red-600">{formatCurrency(totalDebt)}</p>
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl bg-slate-950 p-5 text-white shadow-lg">
+          <p className="text-sm font-semibold text-slate-400">Saldo para eliminar</p>
+          <p className="mt-2 text-3xl font-black">{formatCurrency(totalDebt)}</p>
         </div>
-        <div className="card">
-          <p className="text-gray-600 text-sm">Pagamento Mensal Total</p>
-          <p className="text-3xl font-bold">{formatCurrency(totalMonthlyPayment)}</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-semibold text-slate-500">Compromisso mensal</p>
+          <p className="mt-2 text-3xl font-black">{formatCurrency(totalMonthlyPayment)}</p>
         </div>
-        <div className="card">
-          <p className="text-gray-600 text-sm">Dívidas Ativas</p>
-          <p className="text-3xl font-bold">{debts.length}</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-semibold text-slate-500">Previsão atual</p>
+          <p className="mt-2 text-3xl font-black">{payoff.months === null ? 'Ajustar' : `${payoff.months} meses`}</p>
         </div>
       </div>
 
       {debts.length > 0 && (
-        <div className="card border-blue-200 bg-blue-50">
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 md:p-7">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 className="font-bold text-lg">Escolha sua estratégia</h2>
@@ -235,13 +220,13 @@ export default function Debts() {
             <div className="flex gap-2">
               <button
                 onClick={() => setStrategy('snowball')}
-                className={`btn text-sm ${strategy === 'snowball' ? 'btn-primary' : 'btn-secondary'}`}
+                className={`rounded-xl px-4 py-2.5 text-sm font-black transition ${strategy === 'snowball' ? 'bg-slate-950 text-white' : 'border border-slate-200 bg-white text-slate-600'}`}
               >
                 ❄️ Bola de neve
               </button>
               <button
                 onClick={() => setStrategy('avalanche')}
-                className={`btn text-sm ${strategy === 'avalanche' ? 'btn-primary' : 'btn-secondary'}`}
+                className={`rounded-xl px-4 py-2.5 text-sm font-black transition ${strategy === 'avalanche' ? 'bg-slate-950 text-white' : 'border border-slate-200 bg-white text-slate-600'}`}
               >
                 🏔️ Avalanche
               </button>
@@ -265,7 +250,7 @@ export default function Debts() {
       )}
 
       {/* Add Debt Form */}
-      <div className="card">
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-7">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Adicionar Dívida</h2>
           {showForm && <button className="text-sm text-gray-500" onClick={() => setShowForm(false)}>✕</button>}
@@ -358,12 +343,12 @@ export default function Debts() {
             const progress = originalAmount > 0 ? Math.min(100, (paidAmount / originalAmount) * 100) : 0
             const debtPayments = payments.filter((payment) => payment.debt_id === debt.id)
             return (
-              <div key={debt.id} className="card">
+              <div key={debt.id} className={`rounded-3xl border bg-white p-6 shadow-sm transition hover:shadow-lg ${index === 0 ? 'border-emerald-300 ring-4 ring-emerald-50' : 'border-slate-200'}`}>
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-blue-100 text-blue-900 px-3 py-1 rounded-full text-sm font-medium">
-                        #{index + 1}
+                      <span className={`rounded-full px-3 py-1 text-xs font-black ${index === 0 ? 'bg-emerald-500 text-slate-950' : 'bg-slate-100 text-slate-600'}`}>
+                        {index === 0 ? 'ATACAR AGORA' : `PRIORIDADE ${index + 1}`}
                       </span>
                       <h3 className="text-xl font-bold">{debt.creditor}</h3>
                     </div>
@@ -380,7 +365,7 @@ export default function Debts() {
                 </div>
 
                 <p className="text-sm mb-4 bg-gray-50 rounded-lg p-3">
-                  Prioridade #{index + 1} no método {strategy === 'snowball' ? 'bola de neve' : 'avalanche'}.
+                  {index === 0 ? 'Esta é a dívida que recebe todo valor extra neste momento.' : `Mantenha o pagamento mínimo enquanto você elimina a prioridade ${index}.`}
                 </p>
 
                 <div className="mb-5">
@@ -389,7 +374,7 @@ export default function Debts() {
                     <span>{progress.toFixed(0)}% · {formatCurrency(paidAmount)} pagos</span>
                   </div>
                   <div className="h-3 overflow-hidden rounded-full bg-gray-200">
-                    <div className="h-full rounded-full bg-gradient-to-r from-blue-600 to-emerald-500 transition-all" style={{ width: `${progress}%` }} />
+                    <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${progress}%` }} />
                   </div>
                 </div>
 
@@ -435,7 +420,7 @@ export default function Debts() {
           <form onSubmit={handlePayment} className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-blue-700">ABATER DÍVIDA</p>
+                <p className="text-sm font-black tracking-[.14em] text-emerald-700">REGISTRAR VITÓRIA</p>
                 <h2 id="payment-title" className="text-2xl font-bold">{paymentDebt.creditor}</h2>
                 <p className="mt-1 text-sm text-gray-600">Saldo atual: {formatCurrency(paymentDebt.total_amount)}</p>
               </div>

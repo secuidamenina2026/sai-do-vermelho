@@ -32,9 +32,10 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-bold mb-2">4. Assinatura e cancelamento</h2>
+          <h2 className="text-xl font-bold mb-2">4. Compra, acesso e garantia</h2>
           <p className="text-gray-700">
-            As condições de cobrança, renovação, cancelamento e garantia são apresentadas antes da
+            A compra concede acesso ao serviço pelo período de 12 meses, sem renovação automática.
+            O pagamento é único e as condições de garantia de 7 dias são apresentadas antes da
             contratação no ambiente seguro do provedor de pagamentos.
           </p>
         </section>

@@ -140,12 +140,12 @@ export default function EmergencyReserve() {
       : metrics.saved > 0 ? 'Construindo proteção' : 'Pronto para começar'
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-7xl space-y-6 pb-12">
       <section className="overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 to-slate-950 p-6 text-white shadow-xl md:p-9">
         <div className="grid gap-8 lg:grid-cols-[1.25fr_.75fr] lg:items-center">
           <div>
-            <span className="inline-flex rounded-full bg-emerald-300/15 px-3 py-1 text-sm font-bold text-emerald-300">🛡️ Reserva de Emergência Inteligente</span>
-            <h1 className="mt-4 text-3xl font-bold md:text-5xl">Sua tranquilidade também tem um plano</h1>
+            <span className="inline-flex rounded-full bg-emerald-300/15 px-3 py-1 text-sm font-black uppercase tracking-wide text-emerald-300">Reserva inteligente</span>
+            <h1 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">Sua tranquilidade também tem um plano</h1>
             <p className="mt-4 max-w-2xl text-emerald-50/80">Com base no seu custo essencial de {formatCurrency(metrics.monthlyEssential)}, calculamos duas camadas de proteção para você.</p>
           </div>
           <div className="rounded-2xl bg-white/10 p-5">
@@ -177,7 +177,7 @@ export default function EmergencyReserve() {
 
       <section className="grid gap-6 lg:grid-cols-2">
         <form onSubmit={handleDeposit} className="card">
-          <p className="text-sm font-bold text-blue-700">ATUALIZAR PROGRESSO</p>
+          <p className="text-sm font-black tracking-[.16em] text-emerald-700">ATUALIZAR PROGRESSO</p>
           <h2 className="mt-1 text-2xl font-bold">Quanto você guardou?</h2>
           <p className="mt-2 text-sm text-gray-600">Registre apenas o valor que realmente está separado para emergências.</p>
           <label className="label mt-5">Valor guardado agora</label>
@@ -186,7 +186,7 @@ export default function EmergencyReserve() {
         </form>
 
         <div className="card">
-          <p className="text-sm font-bold text-purple-700">SIMULADOR</p>
+          <p className="text-sm font-black tracking-[.16em] text-violet-700">SIMULADOR</p>
           <h2 className="mt-1 text-2xl font-bold">Escolha seu ritmo mensal</h2>
           <p className="mt-2 text-sm text-gray-600">Veja quando sua proteção ideal poderá ficar pronta.</p>
           <label className="label mt-5">Valor mensal para a reserva</label>

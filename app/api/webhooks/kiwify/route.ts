@@ -1,14 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
+import { annualExpiration } from '@/lib/access-server'
 
 export const dynamic = 'force-dynamic'
 
-// Supabase com service key (server-side, ignora RLS)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-)
+// Inicializado somente quando o webhook é chamado. Assim o build não depende
+// de segredos que existem apenas no ambiente da Vercel.
+const getSupabaseAdmin = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_KEY
+
+  if (!url || !serviceKey) {
+    throw new Error('Supabase não configurado para o webhook')
+  }
+
+  return createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+}
 
 /**
  * Webhook do Kiwify — ativa/desativa o plano do usuário automaticamente.
@@ -23,20 +33,16 @@ const supabase = createClient(
  */
 export async function POST(request: NextRequest) {
   try {
+    const supabase = getSupabaseAdmin()
     const rawBody = await request.text()
 
-    // Validação de assinatura (se o token estiver configurado)
+    // A Kiwify permite cadastrar a URL completa. O segredo deve ser incluído
+    // como ?token=... e é obrigatório para evitar ativações fraudulentas.
     const token = process.env.KIWIFY_WEBHOOK_TOKEN
-    if (token) {
-      const signature = request.nextUrl.searchParams.get('signature') || ''
-      const expected = crypto
-        .createHmac('sha1', token)
-        .update(rawBody)
-        .digest('hex')
-      if (signature !== expected) {
-        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
-      }
-    }
+    const receivedToken = request.nextUrl.searchParams.get('token') || ''
+    if (!token) return NextResponse.json({ error: 'Webhook token not configured' }, { status: 503 })
+    const tokenIsValid = token.length === receivedToken.length && crypto.timingSafeEqual(Buffer.from(token), Buffer.from(receivedToken))
+    if (!tokenIsValid) return NextResponse.json({ error: 'Invalid webhook token' }, { status: 401 })
 
     let payload: any = {}
     try {
@@ -98,11 +104,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ received: true, ignored: eventType || orderStatus })
     }
 
-    // Basic -> 'premium' | Pro -> 'pro'
-    const isPro = /pro/i.test(productName)
-    const newPlan = isCancellation ? 'free' : isPro ? 'pro' : 'premium'
-
     const normalizedEmail = String(email).trim().toLowerCase()
+    const purchaseId = String(order?.order_id || order?.id || payload?.order_id || payload?.transaction_id || crypto.createHash('sha256').update(rawBody).digest('hex'))
+
+    if (isCancellation) {
+      await supabase.from('pending_entitlements').update({ status: 'refunded', updated_at: new Date().toISOString() }).eq('purchase_id', purchaseId)
+      await supabase.from('access_entitlements').update({ status: 'refunded', updated_at: new Date().toISOString() }).eq('purchase_id', purchaseId)
+      await supabase.from('users').update({ plan: 'free' }).ilike('email', normalizedEmail)
+      return NextResponse.json({ received: true, access: 'revoked' })
+    }
+
+    const startsAt = new Date().toISOString()
+    const expiresAt = annualExpiration()
+    const { error: pendingError } = await supabase.from('pending_entitlements').upsert({
+      email: normalizedEmail,
+      status: 'active',
+      source: 'kiwify',
+      purchase_id: purchaseId,
+      starts_at: startsAt,
+      expires_at: expiresAt,
+      updated_at: startsAt,
+    }, { onConflict: 'email' })
+    if (pendingError) return NextResponse.json({ error: pendingError.message }, { status: 500 })
+
+    const isPro = /pro/i.test(productName)
+    const newPlan = isPro ? 'pro' : 'premium'
 
     const { data, error } = await supabase
       .from('users')
@@ -115,18 +141,27 @@ export async function POST(request: NextRequest) {
     }
 
     if (!data || data.length === 0) {
-      // Comprador ainda não criou conta no app — nada a atualizar ainda.
-      // (Ele será orientado pelo e-mail de entrega a criar conta com o mesmo e-mail;
-      //  se comprar antes de criar a conta, ative manualmente ou reenvie o webhook.)
       return NextResponse.json({
         received: true,
-        warning: 'user_not_found',
+        access: 'pending_account_creation',
         email: normalizedEmail,
-        intended_plan: newPlan,
+        expires_at: expiresAt,
       })
     }
 
-    return NextResponse.json({ received: true, updated: data })
+    const { error: entitlementError } = await supabase.from('access_entitlements').upsert({
+      user_id: data[0].id,
+      email: normalizedEmail,
+      status: 'active',
+      source: 'kiwify',
+      purchase_id: purchaseId,
+      starts_at: startsAt,
+      expires_at: expiresAt,
+      updated_at: startsAt,
+    })
+    if (entitlementError) return NextResponse.json({ error: entitlementError.message }, { status: 500 })
+
+    return NextResponse.json({ received: true, access: 'activated', expires_at: expiresAt })
   } catch (err: any) {
     return NextResponse.json(
       { error: err?.message || 'Internal error' },

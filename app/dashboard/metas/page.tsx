@@ -86,6 +86,7 @@ export default function Goals() {
   }
 
   const handleDeleteGoal = async (id: string) => {
+    if (!window.confirm('Remover esta meta?')) return
     try {
       await supabase.from('goals').delete().eq('id', id)
       setGoals(goals.filter((g) => g.id !== id))
@@ -104,9 +105,10 @@ export default function Goals() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">🎯 Metas Financeiras</h1>
-        <p className="text-gray-600">Defina e acompanhe suas metas de poupança</p>
+      <div className="rounded-[2rem] bg-slate-950 p-7 text-white shadow-xl shadow-slate-950/15 md:p-9">
+        <p className="text-xs font-black uppercase tracking-[.2em] text-emerald-300">Dinheiro com propósito</p>
+        <h1 className="mt-2 text-3xl font-black md:text-4xl">🎯 Metas Financeiras</h1>
+        <p className="mt-2 max-w-2xl text-slate-300">Transforme cada valor guardado em uma conquista visível.</p>
       </div>
 
       <div className="grid md:grid-cols-4 gap-4">
@@ -128,7 +130,7 @@ export default function Goals() {
         </div>
       </div>
 
-      <div className="w-full bg-gray-200 rounded-full h-4">
+      <div className="h-4 w-full overflow-hidden rounded-full bg-slate-200">
         <div 
           className="bg-green-600 h-4 rounded-full transition-all" 
           style={{ width: `${Math.min(overallProgress, 100)}%` }}
@@ -195,7 +197,7 @@ export default function Goals() {
       {/* Goals List */}
       <div className="space-y-4">
         {goals.length === 0 ? (
-          <div className="card bg-blue-50 border-blue-200 text-center py-8">
+          <div className="card border-emerald-200 bg-emerald-50 text-center py-10">
             <div className="text-4xl mb-2">📍</div>
             <h3 className="font-bold mb-2">Nenhuma meta definida</h3>
             <p>Defina suas primeiras metas para começar a poupar com propósito</p>
@@ -214,7 +216,7 @@ export default function Goals() {
               : null
 
             return (
-              <div key={goal.id} className="card">
+              <div key={goal.id} className="card border-emerald-100 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-bold mb-1">{goal.goal_name}</h3>
@@ -264,7 +266,7 @@ export default function Goals() {
 
                   <button
                     onClick={() => handleDeleteGoal(goal.id)}
-                    className="w-full btn btn-secondary text-sm"
+                    className="w-full rounded-xl border border-red-100 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
                   >
                     Deletar Meta
                   </button>

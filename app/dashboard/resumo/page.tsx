@@ -114,11 +114,11 @@ export default function MonthlyDiagnosis() {
           : { text: 'Manter os lançamentos atualizados nesta semana', href: '/dashboard/gastos', cta: 'Continuar lançando' }
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-7xl space-y-6 pb-12">
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="text-sm font-bold uppercase tracking-wider text-blue-700">Diagnóstico mensal inteligente</p>
-          <h1 className="mt-1 text-3xl font-bold md:text-4xl">Seu mês traduzido em decisões</h1>
+          <p className="text-sm font-black uppercase tracking-[.16em] text-emerald-700">Diagnóstico mensal inteligente</p>
+          <h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">Seu mês traduzido em decisões</h1>
           <p className="mt-2 text-gray-600">Uma leitura direta do que melhorou e do que fazer agora.</p>
         </div>
         <div className="rounded-2xl bg-slate-950 px-5 py-4 text-white">
@@ -155,7 +155,7 @@ export default function MonthlyDiagnosis() {
 
       <section className="card">
         <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div><p className="text-sm font-bold text-blue-700">ORÇAMENTO REAL</p><h2 className="text-2xl font-bold">Planejado x realizado</h2></div>
+          <div><p className="text-sm font-black tracking-[.16em] text-emerald-700">ORÇAMENTO REAL</p><h2 className="text-2xl font-black">Planejado x realizado</h2></div>
           <p className="text-sm text-gray-500">{recovery ? 'Modo recuperação 60-10-30' : 'Método 50-30-20'}</p>
         </div>
         <div className="space-y-5">
@@ -184,11 +184,11 @@ export default function MonthlyDiagnosis() {
         </section>
       )}
 
-      <section className="rounded-3xl bg-blue-600 p-6 text-white shadow-lg md:p-8">
-        <p className="text-sm font-bold uppercase tracking-wide text-blue-100">Missão dos próximos 7 dias</p>
+      <section className="rounded-3xl bg-emerald-500 p-6 text-slate-950 shadow-lg md:p-8">
+        <p className="text-sm font-black uppercase tracking-wide text-emerald-950/70">Missão dos próximos 7 dias</p>
         <div className="mt-3 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <h2 className="text-2xl font-bold">{mission.text}</h2>
-          <Link href={mission.href} className="whitespace-nowrap rounded-xl bg-white px-5 py-3 text-center font-bold text-blue-700">{mission.cta} →</Link>
+          <Link href={mission.href} className="whitespace-nowrap rounded-xl bg-slate-950 px-5 py-3 text-center font-black text-white">{mission.cta} →</Link>
         </div>
       </section>
       <p className="text-center text-xs text-gray-500">Análise educativa baseada exclusivamente nos dados registrados no aplicativo.</p>
