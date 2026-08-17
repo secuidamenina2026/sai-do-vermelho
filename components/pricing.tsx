@@ -1,5 +1,4 @@
-import Link from 'next/link'
-import { CHECKOUT_URL } from '@/lib/commerce'
+import { CheckoutLink } from '@/components/checkout-link'
 
 const features = [
   'Diagnóstico financeiro e plano de ação',
@@ -37,7 +36,7 @@ export function Pricing() {
             <ul className="my-8 grid gap-4 sm:grid-cols-2">
               {features.map((feature) => <li key={feature} className="flex gap-3 text-sm leading-6 text-slate-300"><span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-400 text-xs font-black text-slate-950">✓</span><span>{feature}</span></li>)}
             </ul>
-            <Link href={CHECKOUT_URL} className="flex w-full items-center justify-center gap-3 rounded-xl bg-emerald-400 px-6 py-4 text-center text-lg font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-emerald-300">Começar agora por R$ 97 <span>→</span></Link>
+            <CheckoutLink className="flex w-full items-center justify-center gap-3 rounded-xl bg-emerald-400 px-6 py-4 text-center text-lg font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-emerald-300">Começar agora por R$ 97 <span>→</span></CheckoutLink>
             <p className="mt-4 text-center text-xs text-slate-500">12 meses de acesso · Compra segura · Garantia de 7 dias</p>
           </div>
         </div>
