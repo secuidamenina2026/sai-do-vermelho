@@ -18,5 +18,9 @@ export function CheckoutLink({ children, className }: { children: ReactNode; cla
     setHref(checkout.toString())
   }, [])
 
-  return <a href={href} className={className}>{children}</a>
+  const trackCheckout = () => {
+    window.dispatchEvent(new CustomEvent('sdv:initiate-checkout'))
+  }
+
+  return <a href={href} className={className} onClick={trackCheckout}>{children}</a>
 }

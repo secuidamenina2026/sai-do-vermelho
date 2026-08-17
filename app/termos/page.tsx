@@ -40,10 +40,15 @@ export default function TermsPage() {
           </p>
         </section>
 
-        <p className="text-sm text-amber-800 bg-amber-50 rounded-lg p-4">
-          Este texto é uma versão inicial operacional e deve passar por revisão jurídica antes da
-          abertura comercial em escala.
-        </p>
+        <section>
+          <h2 className="text-xl font-bold mb-2">5. Uso responsável e disponibilidade</h2>
+          <p className="text-gray-700">O acesso é pessoal e não pode ser compartilhado, revendido ou usado de forma automatizada. Podemos realizar manutenções e melhorias para preservar a segurança e a qualidade do serviço.</p>
+        </section>
+
+        <section>
+          <h2 className="text-xl font-bold mb-2">6. Atendimento</h2>
+          <p className="text-gray-700">Dúvidas sobre acesso, pagamento ou garantia podem ser enviadas para <a className="font-semibold text-emerald-700 hover:underline" href="mailto:contato@ejdigitalia.com">contato@ejdigitalia.com</a>.</p>
+        </section>
       </div>
     </main>
   )
