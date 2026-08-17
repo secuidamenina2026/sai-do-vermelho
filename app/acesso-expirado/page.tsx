@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { CheckoutLink } from '@/components/checkout-link'
 
 export default function AcessoExpirado() {
   return (
@@ -7,7 +7,7 @@ export default function AcessoExpirado() {
         <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-amber-100 text-5xl">🔐</span>
         <h1 className="mt-5 text-3xl font-bold">Seu período de acesso terminou</h1>
         <p className="mx-auto mt-3 max-w-xl text-gray-600">Seus dados continuam protegidos. Renove por mais 12 meses para voltar ao seu plano financeiro e acompanhar sua evolução.</p>
-        <Link href="/#pricing" className="btn btn-primary mt-7 inline-flex">Renovar por mais 12 meses</Link>
+        <CheckoutLink className="btn btn-primary mt-7 inline-flex">Renovar por mais 12 meses</CheckoutLink>
       </div>
     </div>
   )

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { CheckoutLink } from '@/components/checkout-link'
 
 export function Navbar() {
   const [user, setUser] = useState<any>(null)
@@ -57,12 +58,11 @@ export function Navbar() {
                   >
                     Entrar
                   </Link>
-                  <Link
-                    href="/#pricing"
+                  <CheckoutLink
                     className="rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-800"
                   >
                     Começar por R$ 97
-                  </Link>
+                  </CheckoutLink>
                 </>
               )}
             </>
