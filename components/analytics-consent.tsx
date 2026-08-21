@@ -4,7 +4,7 @@ import Script from 'next/script'
 import { useEffect, useState } from 'react'
 
 const CONSENT_KEY = 'sdv-analytics-consent'
-const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID
+const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID || '1039429865521046'
 
 declare global {
   interface Window {
