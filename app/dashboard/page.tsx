@@ -33,7 +33,7 @@ export default function Dashboard() {
         const [profileResult, budgetResult, expensesResult, debtsResult, goalsResult] = await Promise.all([
           supabase.from('users').select('full_name, financial_goal').eq('id', user.id).maybeSingle(),
           supabase.from('monthly_budgets').select('monthly_income, essentials_budget, desires_budget, savings_budget').eq('user_id', user.id).eq('month', month).maybeSingle(),
-          supabase.from('expenses').select('id, category, description, notes, actual_amount').eq('user_id', user.id).gte('month', month).order('created_at', { ascending: false }).limit(6),
+          supabase.from('expenses').select('id, category, description, notes, actual_amount').eq('user_id', user.id).eq('month', month).order('created_at', { ascending: false }),
           supabase.from('debts').select('id, creditor, total_amount, original_amount, monthly_payment, is_paid').eq('user_id', user.id).eq('is_paid', false),
           supabase.from('goals').select('id, goal_name, target_amount, saved_amount').eq('user_id', user.id).eq('is_completed', false).order('priority').limit(1),
         ])
@@ -127,7 +127,7 @@ export default function Dashboard() {
         <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-7">
           <div className="flex items-start justify-between"><div><p className="text-xs font-black uppercase tracking-[.16em] text-slate-400">Este mês</p><h2 className="mt-2 text-xl font-black">Últimos movimentos</h2></div><Link href="/dashboard/gastos" className="text-sm font-bold text-emerald-700 hover:underline">Ver todos</Link></div>
           <div className="mt-5 divide-y divide-slate-100">
-            {expenses.length === 0 ? <div className="rounded-2xl bg-slate-50 px-5 py-10 text-center"><p className="font-bold text-slate-700">Seu histórico começa aqui</p><p className="mt-1 text-sm text-slate-500">Registre um gasto para enxergar seus padrões.</p></div> : expenses.map(expense => <div key={expense.id} className="flex items-center justify-between gap-4 py-3.5"><div className="min-w-0"><p className="truncate font-bold capitalize text-slate-800">{expense.description || expense.category}</p><p className="truncate text-xs capitalize text-slate-400">{expense.category}{expense.notes ? ` · ${expense.notes}` : ''}</p></div><p className="shrink-0 font-black text-slate-900">{money.format(Number(expense.actual_amount))}</p></div>)}
+            {expenses.length === 0 ? <div className="rounded-2xl bg-slate-50 px-5 py-10 text-center"><p className="font-bold text-slate-700">Seu histórico começa aqui</p><p className="mt-1 text-sm text-slate-500">Registre um gasto para enxergar seus padrões.</p></div> : expenses.slice(0, 6).map(expense => <div key={expense.id} className="flex items-center justify-between gap-4 py-3.5"><div className="min-w-0"><p className="truncate font-bold capitalize text-slate-800">{expense.description || expense.category}</p><p className="truncate text-xs capitalize text-slate-400">{expense.category}{expense.notes ? ` · ${expense.notes}` : ''}</p></div><p className="shrink-0 font-black text-slate-900">{money.format(Number(expense.actual_amount))}</p></div>)}
           </div>
         </article>
       </section>
