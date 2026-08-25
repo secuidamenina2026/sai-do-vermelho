@@ -58,7 +58,7 @@ export default function Expenses() {
           .from('expenses')
           .select('*')
           .eq('user_id', user.id)
-          .gte('month', currentMonth)
+          .eq('month', currentMonth)
           .order('due_date', { ascending: false }), supabase.from('user_categories').select('*').eq('user_id', user.id).eq('archived', false).neq('bucket', 'income').order('name')])
 
         if (expensesData) {
