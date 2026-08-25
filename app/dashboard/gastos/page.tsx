@@ -29,6 +29,8 @@ export default function Expenses() {
   const [budget, setBudget] = useState<any>(null)
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [customCategories, setCustomCategories] = useState<CustomCategory[]>([])
   const [newCategory, setNewCategory] = useState('')
   const [categorySearch, setCategorySearch] = useState('')
@@ -84,12 +86,14 @@ export default function Expenses() {
 
   const handleAddExpense = async (e: React.FormEvent) => {
     e.preventDefault()
+    setErrorMessage('')
+    setSaving(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const currentMonth = new Date().toISOString().split('T')[0].slice(0, 7) + '-01'
         
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('expenses')
           .insert({
             user_id: user.id,
@@ -106,6 +110,8 @@ export default function Expenses() {
           })
           .select()
 
+        if (error) throw error
+
         if (data) {
           setExpenses([data[0], ...expenses])
           setFormData({
@@ -119,9 +125,14 @@ export default function Expenses() {
           })
           setShowForm(false)
         }
+      } else {
+        setErrorMessage('Sua sessão expirou. Entre novamente para salvar.')
       }
     } catch (error) {
       console.error('Error adding expense:', error)
+      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível salvar o gasto. Tente novamente.')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -202,6 +213,7 @@ export default function Expenses() {
 
           {showForm ? (
             <form onSubmit={handleAddExpense} className="space-y-4">
+              {errorMessage && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{errorMessage}</div>}
               <div>
                 <label className="label">Descrição</label>
                 <input value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="input" placeholder="Ex.: Conta de energia" required />
@@ -262,8 +274,8 @@ export default function Expenses() {
                 />
               </div>
 
-              <button type="submit" className="btn btn-primary w-full">
-                Adicionar Gasto
+              <button type="submit" disabled={saving} className="btn btn-primary w-full disabled:cursor-not-allowed disabled:opacity-60">
+                {saving ? 'Salvando…' : 'Adicionar Gasto'}
               </button>
             </form>
           ) : (
