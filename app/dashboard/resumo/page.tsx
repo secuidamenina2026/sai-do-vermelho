@@ -28,9 +28,10 @@ export default function MonthlyDiagnosis() {
         const monthStart = `${new Date().toISOString().slice(0, 7)}-01`
         const nextMonth = new Date(`${monthStart}T00:00:00`)
         nextMonth.setMonth(nextMonth.getMonth() + 1)
+        const nextMonthStart = nextMonth.toISOString().slice(0, 10)
         const [budgetResult, expensesResult, debtsResult, paymentsResult] = await Promise.all([
           supabase.from('monthly_budgets').select('*').eq('user_id', user.id).eq('month', monthStart).single(),
-          supabase.from('expenses').select('category,actual_amount').eq('user_id', user.id).gte('month', monthStart),
+          supabase.from('expenses').select('category,actual_amount').eq('user_id', user.id).gte('due_date', monthStart).lt('due_date', nextMonthStart).neq('status', 'canceled'),
           supabase.from('debts').select('*').eq('user_id', user.id).eq('is_paid', false),
           supabase.from('debt_payments').select('debt_id,amount,paid_at').eq('user_id', user.id).gte('paid_at', `${monthStart}T00:00:00`).lt('paid_at', nextMonth.toISOString()),
         ])

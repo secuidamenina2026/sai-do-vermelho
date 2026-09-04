@@ -43,9 +43,12 @@ export default function EmergencyReserve() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
         const monthStart = `${new Date().toISOString().slice(0, 7)}-01`
+        const nextMonth = new Date(`${monthStart}T00:00:00`)
+        nextMonth.setMonth(nextMonth.getMonth() + 1)
+        const nextMonthStart = nextMonth.toISOString().slice(0, 10)
         const [goalResult, expensesResult, budgetResult, debtsResult] = await Promise.all([
           supabase.from('goals').select('*').eq('user_id', user.id).ilike('goal_name', RESERVE_NAME).limit(1).maybeSingle(),
-          supabase.from('expenses').select('category,actual_amount').eq('user_id', user.id).gte('month', monthStart),
+          supabase.from('expenses').select('category,actual_amount').eq('user_id', user.id).gte('due_date', monthStart).lt('due_date', nextMonthStart).neq('status', 'canceled'),
           supabase.from('monthly_budgets').select('monthly_income').eq('user_id', user.id).eq('month', monthStart).single(),
           supabase.from('debts').select('monthly_payment').eq('user_id', user.id).eq('is_paid', false),
         ])

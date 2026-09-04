@@ -53,12 +53,17 @@ export default function Expenses() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const currentMonth = new Date().toISOString().split('T')[0].slice(0, 7) + '-01'
+        const nextMonth = new Date(`${currentMonth}T00:00:00`)
+        nextMonth.setMonth(nextMonth.getMonth() + 1)
+        const nextMonthStart = nextMonth.toISOString().slice(0, 10)
 
         const [{ data: expensesData }, { data: categoryData }] = await Promise.all([supabase
           .from('expenses')
           .select('*')
           .eq('user_id', user.id)
-          .eq('month', currentMonth)
+          .gte('due_date', currentMonth)
+          .lt('due_date', nextMonthStart)
+          .neq('status', 'canceled')
           .order('due_date', { ascending: false }), supabase.from('user_categories').select('*').eq('user_id', user.id).eq('archived', false).neq('bucket', 'income').order('name')])
 
         if (expensesData) {
@@ -91,7 +96,7 @@ export default function Expenses() {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const currentMonth = new Date().toISOString().split('T')[0].slice(0, 7) + '-01'
+        const expenseMonth = `${formData.due_date.slice(0, 7)}-01`
         
         const { data, error } = await supabase
           .from('expenses')
@@ -99,7 +104,7 @@ export default function Expenses() {
             user_id: user.id,
             category: formData.category,
             actual_amount: parseFloat(formData.actual_amount),
-            month: currentMonth,
+            month: expenseMonth,
             notes: formData.notes,
             description: formData.description.trim() || formData.notes.trim() || 'Gasto registrado',
             due_date: formData.due_date,

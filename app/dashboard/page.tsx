@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 type Profile = { full_name?: string | null; financial_goal?: string | null }
 type Budget = { monthly_income: number; essentials_budget: number; desires_budget: number; savings_budget: number }
 type Expense = { id: string; category: string; description?: string | null; notes?: string | null; actual_amount: number }
+type Income = { id: string; amount: number; status: string }
 type Debt = { id: string; creditor: string; total_amount: number; original_amount?: number | null; monthly_payment?: number | null; is_paid: boolean }
 type Goal = { id: string; goal_name: string; target_amount: number; saved_amount: number }
 
@@ -20,6 +21,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<Profile>({})
   const [budget, setBudget] = useState<Budget | null>(null)
   const [expenses, setExpenses] = useState<Expense[]>([])
+  const [incomeEntries, setIncomeEntries] = useState<Income[]>([])
   const [debts, setDebts] = useState<Debt[]>([])
   const [goals, setGoals] = useState<Goal[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,16 +32,21 @@ export default function Dashboard() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
         const month = `${new Date().toISOString().slice(0, 7)}-01`
-        const [profileResult, budgetResult, expensesResult, debtsResult, goalsResult] = await Promise.all([
+        const nextMonth = new Date(`${month}T00:00:00`)
+        nextMonth.setMonth(nextMonth.getMonth() + 1)
+        const nextMonthStart = nextMonth.toISOString().slice(0, 10)
+        const [profileResult, budgetResult, expensesResult, incomeResult, debtsResult, goalsResult] = await Promise.all([
           supabase.from('users').select('full_name, financial_goal').eq('id', user.id).maybeSingle(),
           supabase.from('monthly_budgets').select('monthly_income, essentials_budget, desires_budget, savings_budget').eq('user_id', user.id).eq('month', month).maybeSingle(),
-          supabase.from('expenses').select('id, category, description, notes, actual_amount').eq('user_id', user.id).eq('month', month).order('created_at', { ascending: false }),
+          supabase.from('expenses').select('id, category, description, notes, actual_amount').eq('user_id', user.id).gte('due_date', month).lt('due_date', nextMonthStart).neq('status', 'canceled').order('due_date', { ascending: false }),
+          supabase.from('income_entries').select('id, amount, status').eq('user_id', user.id).gte('expected_date', month).lt('expected_date', nextMonthStart).neq('status', 'canceled'),
           supabase.from('debts').select('id, creditor, total_amount, original_amount, monthly_payment, is_paid').eq('user_id', user.id).eq('is_paid', false),
           supabase.from('goals').select('id, goal_name, target_amount, saved_amount').eq('user_id', user.id).eq('is_completed', false).order('priority').limit(1),
         ])
         setProfile(profileResult.data || { full_name: user.user_metadata?.full_name })
         setBudget(budgetResult.data)
         setExpenses(expensesResult.data || [])
+        setIncomeEntries(incomeResult.data || [])
         setDebts(debtsResult.data || [])
         setGoals(goalsResult.data || [])
       } finally { setLoading(false) }
@@ -48,7 +55,8 @@ export default function Dashboard() {
   }, [])
 
   const metrics = useMemo(() => {
-    const income = Number(budget?.monthly_income || 0)
+    const registeredIncome = incomeEntries.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+    const income = registeredIncome || Number(budget?.monthly_income || 0)
     const spent = expenses.reduce((sum, item) => sum + Number(item.actual_amount || 0), 0)
     const debtTotal = debts.reduce((sum, item) => sum + Number(item.total_amount || 0), 0)
     const originalDebt = debts.reduce((sum, item) => sum + Number(item.original_amount || item.total_amount || 0), 0)
@@ -64,7 +72,7 @@ export default function Dashboard() {
     else if (income > 0 && monthlyPayment / income <= .3) score += 10
     score = Math.min(100, score)
     return { income, spent, debtTotal, originalDebt, monthlyPayment, debtPaid, debtProgress, available, score }
-  }, [budget, debts, expenses])
+  }, [budget, debts, expenses, incomeEntries])
 
   if (loading) return <DashboardSkeleton />
 

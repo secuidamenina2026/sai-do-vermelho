@@ -42,6 +42,9 @@ export async function POST(request: NextRequest) {
 
     // Get user's budget and spending data
     const currentMonth = new Date().toISOString().split('T')[0].slice(0, 7) + '-01'
+    const nextMonth = new Date(`${currentMonth}T00:00:00`)
+    nextMonth.setMonth(nextMonth.getMonth() + 1)
+    const nextMonthStart = nextMonth.toISOString().slice(0, 10)
     const { data: budgetData } = await supabase
       .from('monthly_budgets')
       .select('*')
@@ -54,7 +57,9 @@ export async function POST(request: NextRequest) {
       .select('*')
       .eq('user_id', user.id)
       .eq('category', category)
-      .gte('month', currentMonth)
+      .gte('due_date', currentMonth)
+      .lt('due_date', nextMonthStart)
+      .neq('status', 'canceled')
 
     const income = budgetData?.monthly_income || 0
     const categorySpending = expensesData?.reduce((sum, e) => sum + (e.actual_amount || 0), 0) || 0
