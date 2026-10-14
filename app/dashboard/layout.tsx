@@ -12,14 +12,21 @@ export default function DashboardLayout({
 }) {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [retry, setRetry] = useState(0)
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      setErrorMessage(''); setLoading(true)
+      try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError && authError.status !== 401 && authError.status !== 403 && authError.name !== 'AuthSessionMissingError') throw authError
       if (!user) {
         router.push('/auth/login')
+        return
       } else {
         const accessResponse = await fetch('/api/access/status', { cache: 'no-store' })
+        if (!accessResponse.ok) throw new Error('Não foi possível verificar seu acesso.')
         const access = await accessResponse.json()
         if (!access.active) {
           router.push('/acesso-expirado')
@@ -32,9 +39,15 @@ export default function DashboardLayout({
         }
       }
       setLoading(false)
+      } catch {
+        setErrorMessage('Não foi possível conectar ao sistema. Seus dados não foram alterados. Tente novamente em instantes.')
+        setLoading(false)
+      }
     }
     checkAuth()
-  }, [router])
+  }, [router, retry])
+
+  if (errorMessage) return <div role="alert" className="mx-auto my-12 max-w-xl rounded-xl border border-red-200 p-6"><p>{errorMessage}</p><button className="btn btn-primary mt-4" onClick={() => setRetry(value => value + 1)}>Tentar novamente</button></div>
 
   if (loading) {
     return (

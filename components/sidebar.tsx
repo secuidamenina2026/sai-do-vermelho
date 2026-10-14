@@ -18,6 +18,10 @@ const sections = [
     { href: '/dashboard/reserva', label: 'Minha reserva', icon: '△' },
     { href: '/dashboard/metas', label: 'Metas', icon: '◎' },
   ]},
+  { label: 'Conexão', items: [
+    { href: '/dashboard/renda-extra', label: 'Renda extra', icon: '+' },
+    { href: '/dashboard/dicas', label: 'Dicas e novidades', icon: '✦' },
+  ]},
   { label: 'Inteligência', items: [
     { href: '/dashboard/resumo', label: 'Diagnóstico mensal', icon: '✦' },
     { href: '/dashboard/ia', label: 'Orientação IA', icon: '✧' },
@@ -46,3 +50,4 @@ export function Sidebar() {
     </>
   )
 }
+

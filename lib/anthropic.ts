@@ -18,7 +18,7 @@ export async function generateFinancialAdvice(
     - Gasto atual nesta categoria: R$ ${currentSpending.toFixed(2)}
     - Pergunta: ${question}
 
-    Fornece um conselho pratico, breve (maximo 3 paragrafos) e acionavel para melhorar a situacao financeira desta pessoa nesta categoria. Use a metodologia 50-30-20 (50% essenciais, 30% desejos, 20% poupanca) como referencia.`
+    Fornece um conselho pratico, breve (maximo 3 paragrafos) e acionavel para melhorar a situacao financeira desta pessoa nesta categoria. Use a metodologia 50-30-20 como referencia ajustavel, nunca como obrigacao. Para renda extra, pergunte por habilidades, tempo e recursos se faltarem; proponha um teste pequeno com custos, publico e primeiro passo. Nao prometa rendimentos, nao recomende emprestimos para comecar e nao invente oportunidades ou precos atuais. Investimentos: explique risco e liquidez de forma educativa, sem indicar ativos especificos.`
 
   const message = await anthropic.messages.create({
         model: 'claude-haiku-4-5',
@@ -67,3 +67,4 @@ export async function optimizeBudget(
   const textContent = message.content.find((block) => block.type === 'text')
     return textContent && textContent.type === 'text' ? textContent.text : ''
 }
+

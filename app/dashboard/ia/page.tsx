@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const CATEGORIES = [
   { value: 'geral', label: 'Visão geral' }, { value: 'essenciais', label: 'Contas essenciais' },
   { value: 'desejos', label: 'Gastos com desejos' }, { value: 'dividas', label: 'Dívidas' },
+  { value: 'renda_extra', label: 'Renda extra' },
   { value: 'poupanca', label: 'Reserva e metas' },
 ]
 
@@ -21,6 +22,11 @@ export default function OrientacaoIA() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [usage, setUsage] = useState<{ used: number; limit: number; remaining: number } | null>(null)
+
+  useEffect(() => {
+    const initial = new URLSearchParams(window.location.search).get('pergunta')
+    if (initial) { setQuestion(initial.slice(0, 600)); setCategory('renda_extra') }
+  }, [])
 
   const handleAsk = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -59,3 +65,4 @@ export default function OrientacaoIA() {
     </div>
   )
 }
+
