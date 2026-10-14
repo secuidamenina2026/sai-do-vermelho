@@ -31,6 +31,7 @@ export default function Expenses() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const [customCategories, setCustomCategories] = useState<CustomCategory[]>([])
   const [newCategory, setNewCategory] = useState('')
   const [categorySearch, setCategorySearch] = useState('')
@@ -49,6 +50,7 @@ export default function Expenses() {
   }, [])
 
   const loadExpenses = async () => {
+    setErrorMessage('')
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
@@ -57,7 +59,7 @@ export default function Expenses() {
         nextMonth.setMonth(nextMonth.getMonth() + 1)
         const nextMonthStart = nextMonth.toISOString().slice(0, 10)
 
-        const [{ data: expensesData }, { data: categoryData }] = await Promise.all([supabase
+        const [{ data: expensesData, error: expensesError }, { data: categoryData, error: categoryError }] = await Promise.all([supabase
           .from('expenses')
           .select('*')
           .eq('user_id', user.id)
@@ -66,6 +68,7 @@ export default function Expenses() {
           .neq('status', 'canceled')
           .order('due_date', { ascending: false }), supabase.from('user_categories').select('*').eq('user_id', user.id).eq('archived', false).neq('bucket', 'income').order('name')])
 
+        if (expensesError || categoryError) throw new Error('Não foi possível carregar os gastos ou categorias. Tente novamente.')
         if (expensesData) {
           setExpenses(expensesData)
         }
@@ -81,9 +84,9 @@ export default function Expenses() {
         if (budgetData) {
           setBudget(budgetData)
         }
-      }
+      } else { throw new Error('Sua sessão expirou. Entre novamente.') }
     } catch (error) {
-      console.error('Error loading expenses:', error)
+      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível carregar os gastos.')
     } finally {
       setLoading(false)
     }
@@ -94,6 +97,7 @@ export default function Expenses() {
     setErrorMessage('')
     setSaving(true)
     try {
+      if (!Number.isFinite(Number(formData.actual_amount)) || Number(formData.actual_amount) <= 0) throw new Error('Informe um valor maior que zero.')
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const expenseMonth = `${formData.due_date.slice(0, 7)}-01`
@@ -113,12 +117,12 @@ export default function Expenses() {
             is_recurring: formData.is_recurring,
             recurrence: formData.is_recurring ? 'monthly' : null,
           })
-          .select()
+          .select().single()
 
-        if (error) throw error
+        if (error || !data) throw new Error('Não foi possível salvar o gasto no banco. Tente novamente.')
 
         if (data) {
-          setExpenses([data[0], ...expenses])
+          if (formData.due_date.slice(0, 7) === new Date().toLocaleDateString('en-CA').slice(0, 7)) setExpenses(current => [data, ...current]); setSuccessMessage('Gasto salvo. O histórico mostra o mês atual; gastos de outros meses aparecem no calendário correspondente.')
           setFormData({
             category: 'mercado',
             actual_amount: '',
@@ -145,19 +149,21 @@ export default function Expenses() {
     const name = newCategory.trim()
     if (!name) return
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) { setErrorMessage('Sua sessão expirou. Entre novamente.'); return }
     const slug = `custom-${name.toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`
     const { data, error } = await supabase.from('user_categories').insert({ user_id: user.id, name, slug, icon: '🏷️', bucket: 'essential' }).select().single()
     if (!error && data) { setCustomCategories((items) => [...items, data]); setFormData((current) => ({ ...current, category: data.slug })); setNewCategory('') }
+    else setErrorMessage('Não foi possível criar a categoria. Tente outro nome ou tente novamente.')
   }
 
   const handleDeleteExpense = async (id: string) => {
     if (!window.confirm('Remover este gasto do histórico?')) return
     try {
-      await supabase.from('expenses').delete().eq('id', id)
-      setExpenses(expenses.filter((e) => e.id !== id))
+      const { data, error } = await supabase.from('expenses').delete().eq('id', id).select('id').single()
+      if (error || !data) throw new Error('Não foi possível remover o gasto. Atualize a página e tente novamente.')
+      setExpenses(current => current.filter((e) => e.id !== id)); setErrorMessage('')
     } catch (error) {
-      console.error('Error deleting expense:', error)
+      setErrorMessage(error instanceof Error ? error.message : 'Não foi possível remover o gasto.')
     }
   }
 
@@ -208,6 +214,8 @@ export default function Expenses() {
         )}
       </div>
 
+      {!showForm && errorMessage && <div role="alert" className="card text-red-700">{errorMessage}<button onClick={loadExpenses} className="ml-3 underline">Tentar novamente</button></div>}
+      {successMessage && <p role="status" className="card text-emerald-700">{successMessage}</p>}
       <div className="grid gap-6 lg:grid-cols-[1.08fr_.92fr]">
         {/* Add Expense Form */}
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-7">
@@ -264,6 +272,7 @@ export default function Expenses() {
                   className="input"
                   placeholder="0,00"
                   step="0.01"
+                  min="0.01"
                   required
                 />
               </div>

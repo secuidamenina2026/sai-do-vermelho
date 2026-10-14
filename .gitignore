@@ -37,3 +37,9 @@ fix-auth-cookies.tar.gz
 sync_log.txt
 SYNC.bat
 *.tar.gz
+
+# Local verification
+test-results/
+playwright-report/
+*.tsbuildinfo
+supabase/.temp/
